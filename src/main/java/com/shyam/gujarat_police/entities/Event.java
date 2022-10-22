@@ -1,0 +1,40 @@
+package com.shyam.gujarat_police.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import java.util.Date;
+import java.util.List;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Entity
+public class Event {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String eventName;
+
+    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String eventDetails;
+
+    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private Date eventStartDate;
+
+    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private Date eventEndDate;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST)
+    private List<AssignPolice> assignPolice;
+}
