@@ -34,4 +34,10 @@ public class PoliceStationController {
     public PoliceStation readSpecific(@PathVariable("stationId") Long stationId){
         return policeStationService.readSpecific(stationId);
     }
+
+    @DeleteMapping("/{stationId}")
+    public String deleteSpecific(@PathVariable("stationId") Long stationId) {
+        policeStationService.deletePoliceStation(stationId);
+        return "policeStation deleted successfully with id " + stationId;
+    }
 }

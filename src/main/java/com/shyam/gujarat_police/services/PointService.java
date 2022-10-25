@@ -36,4 +36,7 @@ public class PointService {
         return pointRepository.findById(pointId)
                 .orElseThrow(()->new DataNotFoundException("Point with id: " + pointId + " not found"));
     }
+    public void deletePoint(Long pointId) {
+        pointRepository.deleteById(pointId);
+    }
 }

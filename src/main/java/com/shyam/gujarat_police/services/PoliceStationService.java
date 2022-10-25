@@ -51,4 +51,8 @@ public class PoliceStationService {
         return policeStationRepository.findById(stationId)
                 .orElseThrow(()->new DataNotFoundException("No station found for stationId: " + stationId));
     }
+
+    public void deletePoliceStation(Long stationId){
+        policeStationRepository.deleteById(stationId);
+    }
 }

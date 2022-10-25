@@ -46,7 +46,7 @@ public class PoliceService {
             obtainedPolice.setGender(police.getGender());
             obtainedPolice.setDesignation(police.getDesignation());
             obtainedPolice.setPoliceStation(police.getPoliceStation());
-            return obtainedPolice;
+            return policeRepository.save(obtainedPolice);
         }
     }
 
@@ -54,4 +54,5 @@ public class PoliceService {
         return policeRepository.findById(policeId)
                 .orElseThrow(()->new DataNotFoundException("Police not found with id: " + policeId));
     }
+
 }

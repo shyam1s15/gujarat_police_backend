@@ -24,4 +24,21 @@ public class EventController {
     public Event saveEvent(@RequestBody @Valid Event event){
         return eventService.saveEvent(event);
     }
+
+    @PutMapping("/{eventId}")
+    public Event updateEvent(@RequestBody @Valid Event event,
+        @PathVariable("eventId") Long eventId){
+        return eventService.updateEvent(event, eventId);
+    }
+
+    @DeleteMapping("/{eventId}")
+    public String deleteEvent(@PathVariable("eventId") Long eventId){
+        eventService.deleteEvent(eventId);
+        return "Event deleted successfully with id " + eventId;
+    }
+
+    @GetMapping("/{eventId}/")
+    public Event readSpecific(@PathVariable("eventId") Long eventId){
+        return eventService.readSpecific(eventId);
+    }
 }

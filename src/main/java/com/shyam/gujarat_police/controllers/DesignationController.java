@@ -26,4 +26,20 @@ public class DesignationController {
         return designationSerice.saveDesignation(designation);
     }
 
+    @PutMapping("/{designationId}")
+    public Designation updateDesignation(@RequestBody @NotNull @Valid Designation designation,
+            @PathVariable("designationId") Long designationId){
+        return designationSerice.updateDesignation(designation, designationId);
+    }
+
+    @GetMapping("/{designationId}")
+    public Designation readSpecific(@PathVariable("designationId") Long designationId){
+        return designationSerice.getDesignation(designationId);
+    }
+
+    @DeleteMapping("/{designationId}")
+    public String deleteDesignation(@PathVariable("designationId") Long designationId){
+        designationSerice.deleteDesignation(designationId);
+        return "Designation deleted successfully with id " + designationId;
+    }
 }

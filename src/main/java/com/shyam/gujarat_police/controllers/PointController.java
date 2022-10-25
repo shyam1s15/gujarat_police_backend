@@ -36,4 +36,9 @@ public class PointController {
         return pointService.readSpecific(pointId);
     }
 
+    @DeleteMapping("/{pointId}")
+    public String deleteSpecific(@PathVariable("pointId") Long pointId) {
+        pointService.deletePoint(pointId);
+        return "point deleted successfully with id " + pointId;
+    }
 }
