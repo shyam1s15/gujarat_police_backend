@@ -29,11 +29,9 @@ public class Event {
     @NotEmpty(message = "{validation.name.NotEmpty}")
     private String eventDetails;
 
-    @NotEmpty(message = "{validation.name.NotEmpty}")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date eventStartDate;
 
-    @NotEmpty(message = "{validation.name.NotEmpty}")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date eventEndDate;
 
