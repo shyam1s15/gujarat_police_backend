@@ -29,7 +29,7 @@ public class DesignationSerice {
         }
         Optional<Designation> designationOptional = designationRepository.findById(designationId);
         if ( designationOptional.isEmpty() ) {
-            throw new DataNotFoundException("Designation Id not found: " + designationId);
+            throw new DataNotFoundException("Designation not found: " + designationId);
         } else {
             Designation obtainedDesignation = designationOptional.get();
             obtainedDesignation.setName(designation.getName());

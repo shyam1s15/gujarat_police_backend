@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,9 +30,11 @@ public class Event {
     private String eventDetails;
 
     @NotEmpty(message = "{validation.name.NotEmpty}")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date eventStartDate;
 
     @NotEmpty(message = "{validation.name.NotEmpty}")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date eventEndDate;
 
     @JsonIgnore
