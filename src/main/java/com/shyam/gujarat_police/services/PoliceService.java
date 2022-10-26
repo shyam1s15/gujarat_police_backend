@@ -1,10 +1,12 @@
 package com.shyam.gujarat_police.services;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +28,7 @@ public class PoliceService {
     }
 
     public void deletePolice(Long id) {
-        policeRepository.delete(policeRepository.findById(id).get());
+        policeRepository.deleteById(id);
     }
 
     public Police updatePolice(Police police, Long policeId) {
@@ -55,4 +57,16 @@ public class PoliceService {
                 .orElseThrow(()->new DataNotFoundException("Police not found with id: " + policeId));
     }
 
+    public ResponseEntity<?> officerData() throws JsonProcessingException {
+        List<Police> policeList = (List<Police>) policeRepository.findAll();
+//        Police police = policeList.get(0);
+//        String json = new ObjectMapper().writeValueAsString(policeList.get(0));
+//        Gson gson = new Gson();
+
+//        JsonObject policeObject = gson.fromJson(json, JsonObject.class);
+//        JsonObject policeStationName = new JsonObject();
+//        policeStationName.addProperty("policeStationNameTaluko", police.getPoliceStation().getTaluko());
+//        policeObject.get("results").getAsJsonArray().add(policeStationName);
+        return ResponseEntity.ok( policeList );
+    }
 }

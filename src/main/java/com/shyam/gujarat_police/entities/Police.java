@@ -1,6 +1,5 @@
 package com.shyam.gujarat_police.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,11 +41,13 @@ public class Police {
     @Length(min = 2,max = 10, message = "{validation.name.Size}")
     private String gender;
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "policeStation_id")
+    @NotNull(message = "{validation.name.NotEmpty}")
     private PoliceStation policeStation;
     @ManyToOne
     @JoinColumn(name = "designation_id")
-    @JsonIgnore
+//    @JsonIgnore
+    @NotNull(message = "{validation.name.NotEmpty}")
     private Designation designation;
 }

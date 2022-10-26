@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.services.PoliceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,10 @@ public class PoliceController {
     @GetMapping("/{policeId}")
     public Police readSpecific(@NotNull @PathVariable("policeId") Long policeId){
         return policeService.readSpecific(policeId);
+    }
+
+    @GetMapping("/officer-data")
+    public ResponseEntity<?> officerData() throws JsonProcessingException {
+        return policeService.officerData();
     }
 }

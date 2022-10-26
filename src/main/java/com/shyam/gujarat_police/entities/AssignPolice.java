@@ -1,7 +1,6 @@
 package com.shyam.gujarat_police.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +26,7 @@ public class AssignPolice {
     private Police police;
 
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "point_id")
     private Point point;
 
@@ -35,7 +34,7 @@ public class AssignPolice {
     private Date assignedDate;
 
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "event_id")
     private Event event;
 }
