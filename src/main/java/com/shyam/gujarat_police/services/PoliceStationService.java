@@ -38,6 +38,7 @@ public class PoliceStationService {
             obtainedPoliceStation.setTaluko(policeStation.getTaluko());
             obtainedPoliceStation.setContactNumber(policeStation.getContactNumber());
             obtainedPoliceStation.setAddress(policeStation.getAddress());
+            obtainedPoliceStation.setPoliceStationName(policeStation.getPoliceStationName());
 
             Police headPolice = policeRepository.findById(policeStation.getHeadPolice().getId())
                     .orElseThrow( ()->new DataNotFoundException("Head Police Not Found") );

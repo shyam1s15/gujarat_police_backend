@@ -38,6 +38,10 @@ public class PoliceStation {
     @NotEmpty(message = "{validation.name.NotEmpty}")
     private String address;
 
+    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String policeStationName;
+
+
     @OneToOne
     @JoinColumn(name="headPolice_id")
     private Police headPolice;
