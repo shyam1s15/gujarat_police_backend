@@ -1,7 +1,7 @@
 package com.shyam.gujarat_police.controllers;
 
 import com.shyam.gujarat_police.entities.Designation;
-import com.shyam.gujarat_police.services.DesignationSerice;
+import com.shyam.gujarat_police.services.DesignationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,32 +15,32 @@ import java.util.List;
 public class DesignationController {
 
     @Autowired
-    private DesignationSerice designationSerice;
+    private DesignationService designationService;
 
     @GetMapping("/")
     public List<Designation> getAllDesignations() {
-        return designationSerice.getAllDesignations();
+        return designationService.getAllDesignations();
     }
 
     @PostMapping("/")
     public Designation saveDesignation(@RequestBody @NotNull @Valid Designation designation) {
-        return designationSerice.saveDesignation(designation);
+        return designationService.saveDesignation(designation);
     }
 
     @PutMapping("/{designationId}")
     public Designation updateDesignation(@RequestBody @NotNull @Valid Designation designation,
             @PathVariable("designationId") Long designationId){
-        return designationSerice.updateDesignation(designation, designationId);
+        return designationService.updateDesignation(designation, designationId);
     }
 
     @GetMapping("/{designationId}")
     public Designation readSpecific(@PathVariable("designationId") Long designationId){
-        return designationSerice.getDesignation(designationId);
+        return designationService.getDesignationById(designationId);
     }
 
     @DeleteMapping("/{designationId}")
     public String deleteDesignation(@PathVariable("designationId") Long designationId){
-        designationSerice.deleteDesignation(designationId);
+        designationService.deleteDesignation(designationId);
         return "Designation deleted successfully with id " + designationId;
     }
 }

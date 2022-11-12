@@ -33,7 +33,7 @@ public class PoliceStationController {
 
     @GetMapping("/{stationId}")
     public PoliceStation readSpecific(@PathVariable("stationId") Long stationId){
-        return policeStationService.readSpecific(stationId);
+        return policeStationService.readSpecificById(stationId);
     }
 
     @DeleteMapping("/{stationId}")

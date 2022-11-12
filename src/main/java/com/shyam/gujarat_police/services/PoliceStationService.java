@@ -48,12 +48,19 @@ public class PoliceStationService {
 
     }
 
-    public PoliceStation readSpecific(Long stationId) {
+    public PoliceStation readSpecificById(Long stationId) {
         return policeStationRepository.findById(stationId)
                 .orElseThrow(()->new DataNotFoundException("No station found for stationId: " + stationId));
+    }
+
+    public PoliceStation readSpecificByName(String stationName){
+        return policeStationRepository.findByPoliceStationName(stationName)
+                .orElseThrow(()-> new DataNotFoundException("No station found for stationName: " + stationName));
     }
 
     public void deletePoliceStation(Long stationId){
         policeStationRepository.deleteById(stationId);
     }
+
+
 }

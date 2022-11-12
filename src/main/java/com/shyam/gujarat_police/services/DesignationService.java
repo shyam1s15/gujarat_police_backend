@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class DesignationSerice {
+public class DesignationService {
 
     @Autowired
     private DesignationRepository designationRepository;
@@ -37,9 +37,24 @@ public class DesignationSerice {
         }
     }
 
-    public Designation getDesignation(Long designationId){
+    public Designation getDesignationById(Long designationId){
         return designationRepository.findById(designationId)
                 .orElseThrow(()-> new DataNotFoundException("Designation not found: " + designationId));
+    }
+
+    public Designation getDesignationByName(String designationName){
+        return designationRepository.findByName(designationName)
+                .orElseThrow(()-> new DataNotFoundException("Designation not found: " + designationName));
+    }
+
+    public Designation getDesignationByNameOrCreate(String designationName){
+        return designationRepository.findByName(designationName)
+                .orElseGet(() -> {
+                    Designation designation = new Designation();
+                    designation.setName(designationName);
+                    designationRepository.save(designation);
+                    return designation;
+                });
     }
 
     public void deleteDesignation(Long designationId){
