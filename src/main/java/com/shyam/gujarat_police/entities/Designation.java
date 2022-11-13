@@ -26,6 +26,10 @@ public class Designation {
     @Length(min = 2,max = 20, message = "{validation.name.Size}")
     private String name;
 
+    @NotEmpty(message = "{validation.name.NotEmpty}")
+    @Length(min = 2,max = 20, message = "{validation.name.Size}")
+    private String nameInGujarati;
+
     @JsonIgnore
     @OneToMany(mappedBy = "designation", cascade = CascadeType.PERSIST)
     private List<Police> police;

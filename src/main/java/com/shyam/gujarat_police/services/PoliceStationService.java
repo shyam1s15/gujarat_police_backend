@@ -62,5 +62,8 @@ public class PoliceStationService {
         policeStationRepository.deleteById(stationId);
     }
 
-
+    private boolean isUniqueName(String nameInGujarati, String nameInEnglish){
+        Optional<PoliceStation> isPoliceStationExists = policeStationRepository.findByNameInGujaratiOrEnglish(nameInEnglish, nameInGujarati);
+        return isPoliceStationExists.isEmpty();
+    }
 }

@@ -41,6 +41,8 @@ public class PoliceStation {
     @NotEmpty(message = "{validation.name.NotEmpty}")
     private String policeStationName;
 
+    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String policeStationNameInGujarati;
 
     @OneToOne
     @JoinColumn(name="headPolice_id")
