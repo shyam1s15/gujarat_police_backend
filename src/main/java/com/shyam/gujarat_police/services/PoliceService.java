@@ -3,6 +3,7 @@ package com.shyam.gujarat_police.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.entities.Police;
+import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,12 @@ public class PoliceService {
     }
 
     public Police savePolice(Police police) {
-        return policeRepository.save(police);
+        if (isUniqueBuckleNumber(police.getBuckleNumber())){
+            return policeRepository.save(police);
+        } else {
+            throw new DataAlreadyExistException("Police already exists with buckleNumber "
+                    + police.getBuckleNumber() + " with police Name : " + police.getFullName());
+        }
     }
 
     public void deletePolice(Long id) {
@@ -59,14 +65,11 @@ public class PoliceService {
 
     public ResponseEntity<?> officerData() throws JsonProcessingException {
         List<Police> policeList = (List<Police>) policeRepository.findAll();
-//        Police police = policeList.get(0);
-//        String json = new ObjectMapper().writeValueAsString(policeList.get(0));
-//        Gson gson = new Gson();
-
-//        JsonObject policeObject = gson.fromJson(json, JsonObject.class);
-//        JsonObject policeStationName = new JsonObject();
-//        policeStationName.addProperty("policeStationNameTaluko", police.getPoliceStation().getTaluko());
-//        policeObject.get("results").getAsJsonArray().add(policeStationName);
         return ResponseEntity.ok( policeList );
+    }
+
+    private boolean isUniqueBuckleNumber(String buckleNumber){
+        Optional<Police> isPoliceExists = policeRepository.findByBuckleNumber(buckleNumber);
+        return isPoliceExists.isEmpty();
     }
 }

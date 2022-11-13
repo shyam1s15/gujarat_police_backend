@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.exceptions.ExcelException;
 import org.springframework.http.HttpStatus;
@@ -26,5 +27,10 @@ public class ExceptionController {
     @ExceptionHandler(value = ExcelException.class)
     public ResponseEntity<?> excelProblem(ExcelException excelException){
         return new ResponseEntity<>(excelException.getMessage(), HttpStatus.EXPECTATION_FAILED);
+    }
+
+    @ExceptionHandler(value = DataAlreadyExistException.class)
+    public ResponseEntity<?> dataAlreadyExists(DataAlreadyExistException dataNotFoundException){
+        return new ResponseEntity<>(dataNotFoundException.getMessage(), HttpStatus.EXPECTATION_FAILED);
     }
 }
