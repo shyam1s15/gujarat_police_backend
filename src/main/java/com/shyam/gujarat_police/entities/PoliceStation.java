@@ -30,7 +30,11 @@ public class PoliceStation {
     private String district;
 
     @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String districtInGuj;
+
     private String taluko;
+
+    private String talukoInGuj;
 
     @Pattern(regexp="(^$|[0-9]{10})", message = "{validation.name.Size}")
     private String contactNumber;
