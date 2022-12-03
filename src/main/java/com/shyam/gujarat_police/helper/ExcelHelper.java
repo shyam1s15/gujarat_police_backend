@@ -56,10 +56,7 @@ public class ExcelHelper {
     private PoliceStationService policeStationService;
 
     public static boolean hasExcelFormat(MultipartFile file) {
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-        return true;
+        return TYPE.equals(file.getContentType());
     }
 
     public List<Police> excelToPolice(InputStream is) {
@@ -132,7 +129,7 @@ public class ExcelHelper {
     public List<PoliceStation> excelToPoliceStation(InputStream inputStream) {
 
         try {
-            Workbook workbook = new XSSFWorkbook(is);
+            Workbook workbook = new XSSFWorkbook(inputStream);
 
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();
@@ -163,19 +160,12 @@ public class ExcelHelper {
 
                         switch (cellIdx) {
                             case PoliceStationIndex.POLICESTATION_DISTRICT -> {
-                                Designation designation = designationService.getDesignationByName(cellValue);
-                                policeStation.setDesignation(designation);
+                                policeStation.setDistrict(cellValue);
                             }
-                            case PoliceStationIndex.POLICESTATION_DISTRICT_IN_GUJ -> policeStation.setFullName(cellValue);
-                            case PoliceStationIndex.POLICESTATION_NAME -> policeStation.setBuckleNumber(cellValue);
-                            case PoliceStationIndex.POLICESTATION_NAME_IN_GUJ -> policeStation.setNumber(cellValue);
-//                            case POLICE_STATION -> {
-//                                PoliceStation policeStation = policeStationService.readSpecificByName(cellValue);
-//                                policeStation.setPoliceStation(policeStation);
-//                            }
-//                            case POLICE_DISTRICT -> policeStation.setDistrict(cellValue);
-//                            case POLICE_GENDER -> policeStation.setGender(cellValue);
-//                            case POLICE_AGE -> policeStation.setAge(Integer.parseInt(cellValue));
+                            case PoliceStationIndex.POLICESTATION_DISTRICT_IN_GUJ -> policeStation.setDistrictInGuj(cellValue);
+                            case PoliceStationIndex.POLICESTATION_NAME -> policeStation.setPoliceStationName(cellValue);
+                            case PoliceStationIndex.POLICESTATION_NAME_IN_GUJ -> policeStation.setPoliceStationNameInGujarati(cellValue);
+
                             default -> {
                                 logger.info("Unknown cell type: " + currentCell.getStringCellValue());
                             }
