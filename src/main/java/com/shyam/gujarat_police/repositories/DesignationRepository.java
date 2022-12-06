@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface DesignationRepository extends PagingAndSortingRepository<Designation, Long> {
+public interface DesignationRepository extends PagingAndSortingRepository<Designation, Long>, DesignationBaseRepository {
     Optional<Designation> findByName(String designationName);
 }

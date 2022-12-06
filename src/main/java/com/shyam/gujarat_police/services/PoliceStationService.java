@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.response.DistrictTalukaAndPoliceStationNameRespDto;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
@@ -39,10 +40,11 @@ public class PoliceStationService {
             obtainedPoliceStation.setContactNumber(policeStation.getContactNumber());
             obtainedPoliceStation.setAddress(policeStation.getAddress());
             obtainedPoliceStation.setPoliceStationName(policeStation.getPoliceStationName());
-
-            Police headPolice = policeRepository.findById(policeStation.getHeadPolice().getId())
-                    .orElseThrow( ()->new DataNotFoundException("Head Police Not Found") );
-            obtainedPoliceStation.setHeadPolice(headPolice);
+            if (policeStation.getHeadPolice() != null) {
+                Police headPolice = policeRepository.findById(policeStation.getHeadPolice().getId())
+                        .orElseThrow(() -> new DataNotFoundException("Head Police Not Found"));
+                obtainedPoliceStation.setHeadPolice(headPolice);
+            }
             return obtainedPoliceStation;
         }
 
@@ -65,5 +67,20 @@ public class PoliceStationService {
     private boolean isUniqueName(String nameInGujarati, String nameInEnglish){
         Optional<PoliceStation> isPoliceStationExists = policeStationRepository.findByNameInGujaratiOrEnglish(nameInEnglish, nameInGujarati);
         return isPoliceStationExists.isEmpty();
+    }
+
+    public int saveMultiple(List<PoliceStation> policeStations){
+        List<PoliceStation> uniquePoliceStation = policeStations.stream().
+                filter(station -> !isPoliceStationExists(station)).toList();
+        policeStationRepository.saveAll(uniquePoliceStation);
+        return uniquePoliceStation.size();
+    }
+
+    private boolean isPoliceStationExists(PoliceStation station){
+        return policeStationRepository.isStationExists(station);
+    }
+
+    public List<DistrictTalukaAndPoliceStationNameRespDto> getDistrictTalukaAndPoliceStation() {
+        return policeStationRepository.getDistrictTalukaAndPoliceStation();
     }
 }

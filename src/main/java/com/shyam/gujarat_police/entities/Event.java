@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-public class Event {
+public class Event extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

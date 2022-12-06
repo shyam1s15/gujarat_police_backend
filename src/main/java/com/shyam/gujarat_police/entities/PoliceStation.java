@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class PoliceStation {
+public class PoliceStation extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -39,7 +39,7 @@ public class PoliceStation {
     @Pattern(regexp="(^$|[0-9]{10})", message = "{validation.name.Size}")
     private String contactNumber;
 
-    @NotEmpty(message = "{validation.name.NotEmpty}")
+//    @NotEmpty(message = "{validation.name.NotEmpty}")
     private String address;
 
     @NotEmpty(message = "{validation.name.NotEmpty}")

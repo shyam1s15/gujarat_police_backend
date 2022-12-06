@@ -1,0 +1,24 @@
+branch-defaults:
+  main:
+    environment: null
+    group_suffix: null
+  master:
+    environment: gujarat-police-prod
+global:
+  application_name: gujarat_police
+  branch: null
+  default_ec2_keyname: aws-eb
+  default_platform: Corretto 17 running on 64bit Amazon Linux 2
+  default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: eb-cli
+  repository: null
+  sc: git
+  workspace_type: Application
+
+deploy:
+  artifact: target/gujarat_police-0.0.1-SNAPSHOT.jar
+

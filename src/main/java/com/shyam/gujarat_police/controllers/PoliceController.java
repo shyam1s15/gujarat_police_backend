@@ -64,8 +64,8 @@ public class PoliceController {
         String message = "";
 
         if (ExcelHelper.hasExcelFormat(file)){
-            excelService.savePoliceFromExcel(file);
-            message = "Police Uploaded from Excel successfully";
+            int totalPoliceInserted = excelService.savePoliceFromExcel(file);
+            message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
             return ResponseEntity.ok(message);
         }
         return ResponseEntity.ok("Something went wrong");

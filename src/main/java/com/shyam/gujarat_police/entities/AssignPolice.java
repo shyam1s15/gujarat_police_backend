@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class AssignPolice {
+public class AssignPolice extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

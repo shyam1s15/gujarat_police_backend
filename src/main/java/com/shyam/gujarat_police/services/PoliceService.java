@@ -3,6 +3,7 @@ package com.shyam.gujarat_police.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.entities.Police;
+import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
@@ -71,5 +72,17 @@ public class PoliceService {
     private boolean isUniqueBuckleNumber(String buckleNumber){
         Optional<Police> isPoliceExists = policeRepository.findByBuckleNumber(buckleNumber);
         return isPoliceExists.isEmpty();
+    }
+
+    public int saveMultiple(List<Police> policeListFromExcel) {
+        List<Police> uniquePolice = policeListFromExcel.stream().
+                filter(police -> !isPoliceExists(police)).toList();
+        policeRepository.saveAll(uniquePolice);
+        return uniquePolice.size();
+    }
+
+
+    private boolean isPoliceExists(Police station){
+        return policeRepository.isPoliceExists(station);
     }
 }

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PoliceRepository extends PagingAndSortingRepository<Police, Long> {
+public interface PoliceRepository extends PagingAndSortingRepository<Police, Long>, PoliceBaseRepository     {
     Optional<Police> findByBuckleNumber(String buckleNumber);
 }
