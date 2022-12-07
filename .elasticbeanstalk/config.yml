@@ -3,7 +3,13 @@ branch-defaults:
     environment: null
     group_suffix: null
   master:
-    environment: gujarat-police-prod
+    environment: gujarat-police-dev
+#deploy:
+#  artifact: target/gujarat_police-0.0.1-SNAPSHOT.jar
+environment-defaults:
+  gujarat-police-dev:
+    branch: master
+    repository: gujarat_police
 global:
   application_name: gujarat_police
   branch: null
@@ -18,7 +24,3 @@ global:
   repository: null
   sc: git
   workspace_type: Application
-
-deploy:
-  artifact: target/gujarat_police-0.0.1-SNAPSHOT.jar
-

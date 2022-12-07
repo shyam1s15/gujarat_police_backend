@@ -47,4 +47,5 @@ public class DesignationController {
         designationService.deleteDesignation(designationId);
         return APIResponse.ok("Designation deleted successfully with id " + designationId);
     }
+
 }
