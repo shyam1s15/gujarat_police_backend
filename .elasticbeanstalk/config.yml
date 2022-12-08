@@ -8,8 +8,8 @@ deploy:
   artifact: target/gujarat_police-0.0.1-SNAPSHOT.jar
 environment-defaults:
   gujarat-police-dev:
-    branch: master
-    repository: gujarat_police
+    branch: null
+    repository: null
 global:
   application_name: gujarat_police
   branch: null
