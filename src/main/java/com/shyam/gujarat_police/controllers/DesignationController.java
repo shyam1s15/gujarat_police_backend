@@ -19,8 +19,8 @@ public class DesignationController {
     private DesignationService designationService;
 
     @GetMapping("/")
-    public List<Designation> getAllDesignations() {
-        return designationService.getAllDesignations();
+    public APIResponse getAllDesignations() {
+        return APIResponse.ok(designationService.getAllDesignations());
     }
 
     @PostMapping("/")

@@ -7,6 +7,7 @@ import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
+import com.shyam.gujarat_police.response.APIResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -64,9 +65,9 @@ public class PoliceService {
                 .orElseThrow(()->new DataNotFoundException("Police not found with id: " + policeId));
     }
 
-    public ResponseEntity<?> officerData() throws JsonProcessingException {
+    public APIResponse officerData() throws JsonProcessingException {
         List<Police> policeList = (List<Police>) policeRepository.findAll();
-        return ResponseEntity.ok( policeList );
+        return APIResponse.ok( policeList );
     }
 
     private boolean isUniqueBuckleNumber(String buckleNumber){
