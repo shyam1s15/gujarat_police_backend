@@ -1,19 +1,11 @@
 branch-defaults:
   main:
-    environment: null
-    group_suffix: null
-  master:
     environment: gujarat-police-dev
-deploy:
-  artifact: target/gujarat_police-0.0.1-SNAPSHOT.jar
-environment-defaults:
-  gujarat-police-dev:
-    branch: master
-    repository: gujarat_police
+    group_suffix: null
 global:
-  application_name: gujarat_police
+  application_name: gujarat_police_backend
   branch: null
-  default_ec2_keyname: aws-eb
+  default_ec2_keyname: null
   default_platform: Corretto 17 running on 64bit Amazon Linux 2
   default_region: us-west-2
   include_git_submodules: true
@@ -24,3 +16,6 @@ global:
   repository: null
   sc: git
   workspace_type: Application
+
+deploy:
+  artifact: target/gujarat_police-0.0.1-SNAPSHOT.jar
