@@ -139,6 +139,7 @@
                 </executions>
             </plugin>
         </plugins>
+        <finalName>gujarat-police-backend</finalName>
     </build>
     <packaging>maven-plugin</packaging>
 
