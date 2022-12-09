@@ -1,8 +1,11 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.FindByDesignationDto;
 import com.shyam.gujarat_police.entities.Designation;
+import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.DesignationRepository;
+import com.shyam.gujarat_police.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +23,15 @@ public class DesignationService {
     }
 
     public Designation saveDesignation(Designation designation) {
-        return designationRepository.save(designation);
+        if (isDesignationExist(designation)){
+            throw new DataAlreadyExistException("Designation already exists for " + designation.getName());
+        } else {
+            return designationRepository.save(designation);
+        }
     }
 
-    public Designation updateDesignation(Designation designation, Long designationId) {
-        if (Objects.nonNull(designationId)){
+    public Designation updateDesignation(FindByDesignationDto designation, Long designationId) {
+        if (!Objects.nonNull(designationId)){
             throw new DataNotFoundException("Designation Id not found: " + designationId);
         }
         Optional<Designation> designationOptional = designationRepository.findById(designationId);
@@ -32,7 +39,12 @@ public class DesignationService {
             throw new DataNotFoundException("Designation not found: " + designationId);
         } else {
             Designation obtainedDesignation = designationOptional.get();
-            obtainedDesignation.setName(designation.getName());
+            if (TextUtils.notBankNotEmpty(designation.getName())) {
+                obtainedDesignation.setName(designation.getName());
+            }
+            if (TextUtils.notBankNotEmpty(designation.getNameInGujarati())) {
+                obtainedDesignation.setNameInGujarati(designation.getNameInGujarati());
+            }
             return designationRepository.save(obtainedDesignation);
         }
     }
@@ -60,4 +72,22 @@ public class DesignationService {
     public void deleteDesignation(Long designationId){
         designationRepository.deleteById(designationId);
     }
+
+    public boolean isDesignationExist(Designation designation){
+        return designationRepository.findbyNameOrNameInGujarati(designation.getName(), designation.getNameInGujarati()).size() > 0;
+    }
+
+    public List<Designation> findInDesignation(FindByDesignationDto designation){
+        List<Designation> resp = designationRepository.findbyNameOrNameInGujarati(designation.getName(), designation.getNameInGujarati());
+        if (resp.size() > 0) {
+            return resp;
+        } else {
+            throw new DataNotFoundException("Designation not found: " + designation);
+        }
+    }
+
+//    public Designation getDesignationByNameOrNameInGujarati(String cellValue) {
+//        return designationRepository.findbyNameOrNameInGujarati(designationName)
+//                .orElseThrow(()-> new DataNotFoundException("Designation not found: " + designationName));
+//    }
 }

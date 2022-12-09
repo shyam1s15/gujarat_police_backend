@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.dto.request.FindByDesignationDto;
 import com.shyam.gujarat_police.entities.Designation;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.DesignationService;
@@ -30,7 +31,7 @@ public class DesignationController {
     }
 
     @PutMapping("/{designationId}")
-    public APIResponse updateDesignation(@RequestBody @NotNull @Valid Designation designation,
+    public APIResponse updateDesignation(@RequestBody FindByDesignationDto designation,
             @PathVariable("designationId") Long designationId){
         Designation dto = designationService.updateDesignation(designation, designationId);
         return APIResponse.ok(dto);
@@ -46,5 +47,11 @@ public class DesignationController {
     public APIResponse deleteDesignation(@PathVariable("designationId") Long designationId){
         designationService.deleteDesignation(designationId);
         return APIResponse.ok("Designation deleted successfully with id " + designationId);
+    }
+
+    @GetMapping("/find-by")
+    public APIResponse findByDesignation(@RequestBody FindByDesignationDto dto){
+        List<Designation> resp = designationService.findInDesignation(dto);
+        return APIResponse.ok(resp);
     }
 }
