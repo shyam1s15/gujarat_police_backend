@@ -20,6 +20,7 @@ public class DesignationService {
     private DesignationRepository designationRepository;
     public List<Designation> getAllDesignations() {
         return (List<Designation>) designationRepository.findAll();
+
     }
 
     public Designation saveDesignation(Designation designation) {
