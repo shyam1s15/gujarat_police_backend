@@ -3,6 +3,7 @@ package com.shyam.gujarat_police.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.helper.ExcelHelper;
+import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.ExcelService;
 import com.shyam.gujarat_police.services.PoliceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,47 +29,50 @@ public class PoliceController {
     private ExcelService excelService;
 
     @GetMapping("/")
-    public List<Police> getAllPolice(){
-        return policeService.getAllPolice();
+    public APIResponse getAllPolice(){
+        return APIResponse.ok(policeService.getAllPolice());
     }
 
     @PostMapping("/")
-    public Police savePolice(@RequestBody @Valid @NotNull @NotBlank Police police){
-        return policeService.savePolice(police);
+    public APIResponse savePolice(@RequestBody @Valid @NotNull @NotBlank Police police){
+        Police savedPolice = policeService.savePolice(police);
+        return APIResponse.ok(savedPolice);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePolice(@NotNull @PathVariable Long id){
+    public APIResponse deletePolice(@NotNull @PathVariable Long id){
         policeService.deletePolice(id);
-        return ResponseEntity.ok("Police was successfully deleted");
+        return APIResponse.ok("Police was successfully deleted");
     }
 
     @PutMapping("/{policeId}")
-    public Police updatePolice(@RequestBody @Valid @NotNull @NotBlank Police police,
+    public APIResponse updatePolice(@RequestBody @Valid @NotNull @NotBlank Police police,
                                @PathVariable("policeId") Long policeId){
-        return policeService.updatePolice(police, policeId);
+        Police updatedPolice = policeService.updatePolice(police, policeId);
+        return APIResponse.ok(updatedPolice);
     }
 
     @GetMapping("/{policeId}")
-    public Police readSpecific(@NotNull @PathVariable("policeId") Long policeId){
-        return policeService.readSpecific(policeId);
+    public APIResponse readSpecific(@NotNull @PathVariable("policeId") Long policeId){
+        Police police = policeService.readSpecific(policeId);
+        return APIResponse.ok(police);
     }
 
     @GetMapping("/officer-data")
-    public ResponseEntity<?> officerData() throws JsonProcessingException {
+    public APIResponse officerData() throws JsonProcessingException {
         return policeService.officerData();
     }
 
     @PostMapping("/upload-from-excel")
-    public ResponseEntity<?> uploadFromExcel(@RequestParam("file") MultipartFile file) throws IOException {
+    public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile file) throws IOException {
         String message = "";
 
         if (ExcelHelper.hasExcelFormat(file)){
             int totalPoliceInserted = excelService.savePoliceFromExcel(file);
             message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
-            return ResponseEntity.ok(message);
+            return APIResponse.ok(message);
         }
-        return ResponseEntity.ok("Something went wrong");
+        return APIResponse.ok("Something went wrong");
     }
 
 }

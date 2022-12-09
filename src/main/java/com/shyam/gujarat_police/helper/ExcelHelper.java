@@ -6,7 +6,7 @@ import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.ExcelException;
 import com.shyam.gujarat_police.services.DesignationService;
 import com.shyam.gujarat_police.services.PoliceStationService;
-import com.shyam.gujarat_police.util.TextUtil;
+import com.shyam.gujarat_police.util.TextUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +94,7 @@ public class ExcelHelper {
 
                         switch (cellIdx) {
                             case PoliceIndex.POLICE_DESIGNATION -> {
-                                Designation designation = designationService.getDesignationByName(cellValue);
+                                Designation designation = designationService.getDesignationByNameOrNameInGujarati(cellValue);
                                 police.setDesignation(designation);
                             }
                             case PoliceIndex.POLICE_FULLNAME -> police.setFullName(cellValue);
@@ -196,10 +196,10 @@ public class ExcelHelper {
                 policeStation.setTaluko("-");
                 policeStation.setTalukoInGuj("-");
                 policeStation.setContactNumber("");
-                if (TextUtil.notNullNotBlank(policeStation.getPoliceStationName()) &&
-                        TextUtil.notNullNotBlank(policeStation.getPoliceStationNameInGujarati()) &&
-                        TextUtil.notNullNotBlank(policeStation.getDistrict()) &&
-                        TextUtil.notNullNotBlank(policeStation.getDistrictInGuj())) {
+                if (TextUtils.notBankNotEmpty(policeStation.getPoliceStationName()) &&
+                        TextUtils.notBankNotEmpty(policeStation.getPoliceStationNameInGujarati()) &&
+                        TextUtils.notBankNotEmpty(policeStation.getDistrict()) &&
+                        TextUtils.notBankNotEmpty(policeStation.getDistrictInGuj())) {
                     policeStationListFromExcel.add(policeStation);
                 }
             }
