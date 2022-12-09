@@ -8,18 +8,23 @@ deploy:
   artifact: target/gujarat_police-0.0.1-SNAPSHOT.jar
 environment-defaults:
   gujarat-police-dev:
+<<<<<<< HEAD
     branch: null
     repository: null
+=======
+    branch: master
+    repository: gujarat_police
+>>>>>>> master
 global:
   application_name: gujarat_police
-  branch: null
+  branch: master
   default_ec2_keyname: aws-eb
   default_platform: Corretto 17 running on 64bit Amazon Linux 2
   default_region: us-west-2
   include_git_submodules: true
   instance_profile: null
   platform_name: null
-  platform_version: null
+  platform_version: V3
   profile: eb-cli
   repository: null
   sc: git
