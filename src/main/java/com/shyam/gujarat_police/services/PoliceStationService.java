@@ -76,8 +76,11 @@ public class PoliceStationService {
         return uniquePoliceStation.size();
     }
 
-    private boolean isPoliceStationExists(PoliceStation station){
+    public boolean isPoliceStationExists(PoliceStation station){
         return policeStationRepository.isStationExists(station);
+    }
+    public boolean isPoliceStationExists(String stationName){
+        return policeStationRepository.isStationExists(stationName);
     }
 
     public List<DistrictTalukaAndPoliceStationNameRespDto> getDistrictTalukaAndPoliceStation() {

@@ -4,4 +4,7 @@ import com.shyam.gujarat_police.entities.PoliceStation;
 
 public interface PoliceStationBaseRepository {
     boolean isStationExists(PoliceStation station);
+    boolean isStationExists(String stationName);
+
+//    PoliceStation findbyPoliceStationName(String stationName);
 }

@@ -49,12 +49,9 @@ public class DesignationController {
         return APIResponse.ok("Designation deleted successfully with id " + designationId);
     }
 
-<<<<<<< HEAD
     @GetMapping("/find-by")
     public APIResponse findByDesignation(@RequestBody FindByDesignationDto dto){
         List<Designation> resp = designationService.findInDesignation(dto);
         return APIResponse.ok(resp);
     }
-=======
->>>>>>> master
 }

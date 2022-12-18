@@ -27,4 +27,31 @@ public class PoliceStationBaseRepositoryImpl extends BaseRepository<PoliceStatio
         List<Tuple> tupleList = query.getResultList();
         return tupleList.size() > 0;
     }
+
+    @Override
+    public boolean isStationExists(String stationName) {
+        String queryString = "select ps from PoliceStation ps where " +
+                "ps.stationName = :stationName or ps.stationNameInGujarati = :stationName";
+//        String queryString = "Select ps from PoliceStation ps";
+        Query query = entityManager.createQuery(queryString, Tuple.class);
+        query.setParameter("stationName", stationName);
+
+        List<Tuple> tupleList = query.getResultList();
+        return tupleList.size() > 0;
+    }
+
+//    @Override
+//    public PoliceStation findbyPoliceStationName(String stationName) {
+//        String queryString = "select ps from PoliceStation ps where " +
+//                "ps.stationName = :stationName or ps.stationNameInGujarati = :stationName";
+////        String queryString = "Select ps from PoliceStation ps";
+//        Query query = entityManager.createQuery(queryString, Tuple.class);
+//        query.setParameter("stationName", stationName);
+//
+//        List<Tuple> tupleList = query.getResultList();
+//        PoliceStation policeStation = new PoliceStation();
+//        Tuple tuple = tupleList.get(0);
+////        return policeStation;
+//    }
+
 }

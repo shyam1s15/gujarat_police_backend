@@ -18,13 +18,14 @@ public class DesignationService {
 
     @Autowired
     private DesignationRepository designationRepository;
+
     public List<Designation> getAllDesignations() {
         return (List<Designation>) designationRepository.findAll();
 
     }
 
     public Designation saveDesignation(Designation designation) {
-        if (isDesignationExist(designation)){
+        if (isDesignationExist(designation.getName(), designation.getNameInGujarati())) {
             throw new DataAlreadyExistException("Designation already exists for " + designation.getName());
         } else {
             return designationRepository.save(designation);
@@ -32,11 +33,11 @@ public class DesignationService {
     }
 
     public Designation updateDesignation(FindByDesignationDto designation, Long designationId) {
-        if (!Objects.nonNull(designationId)){
+        if (!Objects.nonNull(designationId)) {
             throw new DataNotFoundException("Designation Id not found: " + designationId);
         }
         Optional<Designation> designationOptional = designationRepository.findById(designationId);
-        if ( designationOptional.isEmpty() ) {
+        if (designationOptional.isEmpty()) {
             throw new DataNotFoundException("Designation not found: " + designationId);
         } else {
             Designation obtainedDesignation = designationOptional.get();
@@ -50,17 +51,17 @@ public class DesignationService {
         }
     }
 
-    public Designation getDesignationById(Long designationId){
+    public Designation getDesignationById(Long designationId) {
         return designationRepository.findById(designationId)
-                .orElseThrow(()-> new DataNotFoundException("Designation not found: " + designationId));
+                .orElseThrow(() -> new DataNotFoundException("Designation not found: " + designationId));
     }
 
-    public Designation getDesignationByName(String designationName){
+    public Designation getDesignationByName(String designationName) {
         return designationRepository.findByName(designationName)
-                .orElseThrow(()-> new DataNotFoundException("Designation not found: " + designationName));
+                .orElseThrow(() -> new DataNotFoundException("Designation not found: " + designationName));
     }
 
-    public Designation getDesignationByNameOrCreate(String designationName){
+    public Designation getDesignationByNameOrCreate(String designationName) {
         return designationRepository.findByName(designationName)
                 .orElseGet(() -> {
                     Designation designation = new Designation();
@@ -70,15 +71,15 @@ public class DesignationService {
                 });
     }
 
-    public void deleteDesignation(Long designationId){
+    public void deleteDesignation(Long designationId) {
         designationRepository.deleteById(designationId);
     }
 
-    public boolean isDesignationExist(Designation designation){
-        return designationRepository.findbyNameOrNameInGujarati(designation.getName(), designation.getNameInGujarati()).size() > 0;
+    private boolean isDesignationExist(String name, String nameInGujarati) {
+        return designationRepository.findbyNameOrNameInGujarati(name, nameInGujarati).size() > 0;
     }
 
-    public List<Designation> findInDesignation(FindByDesignationDto designation){
+    public List<Designation> findInDesignation(FindByDesignationDto designation) {
         List<Designation> resp = designationRepository.findbyNameOrNameInGujarati(designation.getName(), designation.getNameInGujarati());
         if (resp.size() > 0) {
             return resp;
@@ -87,8 +88,11 @@ public class DesignationService {
         }
     }
 
-//    public Designation getDesignationByNameOrNameInGujarati(String cellValue) {
-//        return designationRepository.findbyNameOrNameInGujarati(designationName)
-//                .orElseThrow(()-> new DataNotFoundException("Designation not found: " + designationName));
-//    }
+    public Designation getDesignationByNameOrNameInGujarati(String designationName) {
+        List<Designation> designations = designationRepository.findbyNameOrNameInGujarati(designationName);
+        if (designations == null || designations.size() == 0) {
+            throw new DataNotFoundException("Designation not found: " + designationName);
+        }
+        return designations.get(0);
+    }
 }

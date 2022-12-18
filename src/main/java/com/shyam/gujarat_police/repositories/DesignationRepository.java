@@ -14,4 +14,7 @@ public interface DesignationRepository extends PagingAndSortingRepository<Design
 
     @Query("select d from Designation d where d.name = ?1 or d.nameInGujarati = ?2 ")
     List<Designation> findbyNameOrNameInGujarati(String designationName, String designationNameInGujarati);
+
+    @Query("select d from Designation d where d.name = ?1 or d.nameInGujarati = ?1 ")
+    List<Designation> findbyNameOrNameInGujarati(String designationName);
 }

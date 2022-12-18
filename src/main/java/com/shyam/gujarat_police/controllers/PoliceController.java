@@ -1,13 +1,13 @@
 package com.shyam.gujarat_police.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.shyam.gujarat_police.dto.request.CreatePoliceDto;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.helper.ExcelHelper;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.ExcelService;
 import com.shyam.gujarat_police.services.PoliceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +15,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -34,7 +33,7 @@ public class PoliceController {
     }
 
     @PostMapping("/")
-    public APIResponse savePolice(@RequestBody @Valid @NotNull @NotBlank Police police){
+    public APIResponse savePolice(@RequestBody CreatePoliceDto police){
         Police savedPolice = policeService.savePolice(police);
         return APIResponse.ok(savedPolice);
     }
