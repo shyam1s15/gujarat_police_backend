@@ -3,6 +3,7 @@ package com.shyam.gujarat_police.services;
 import com.shyam.gujarat_police.dto.response.DistrictTalukaAndPoliceStationNameRespDto;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
+import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.repositories.PoliceStationRepository;
@@ -25,7 +26,11 @@ public class PoliceStationService {
     }
 
     public PoliceStation savePoliceStation(PoliceStation station) {
-        return policeStationRepository.save(station);
+        if (isUniqueName(station.getPoliceStationName(), station.getPoliceStationNameInGujarati())){
+            return policeStationRepository.save(station);
+        } else {
+            throw new DataAlreadyExistException("PoliceStation already exists " + station.getPoliceStationName());
+        }
     }
 
     public PoliceStation updatePoliceStation(PoliceStation policeStation, Long stationId) {
