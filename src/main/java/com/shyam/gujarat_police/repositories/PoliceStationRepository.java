@@ -20,4 +20,8 @@ public interface PoliceStationRepository extends JpaRepository<PoliceStation, Lo
 
     @Query("select new com.shyam.gujarat_police.dto.response.DistrictTalukaAndPoliceStationNameRespDto( ps.district, ps.districtInGuj, ps.taluko, ps.talukoInGuj, ps.policeStationName, ps.policeStationNameInGujarati ) from PoliceStation ps")
     List<DistrictTalukaAndPoliceStationNameRespDto> getDistrictTalukaAndPoliceStation();
+
+    @Query("select ps from PoliceStation ps where ps.policeStationName = ?1 or ps.policeStationNameInGujarati = ?1")
+    List<PoliceStation> findbyPoliceStationNameOrNameInGuj(String stationName);
+
 }

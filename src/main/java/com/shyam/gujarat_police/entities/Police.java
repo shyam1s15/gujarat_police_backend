@@ -25,20 +25,20 @@ public class Police extends BaseModel {
     private String fullName;
     private String buckleNumber;
 
-    @Pattern(regexp="(^$|[0-9]{10})", message = "{validation.name.Size}")
+//    @Pattern(regexp="(0/91)?[6-9][0-9]{9}", message = "{validation.name.Size}")
     private String number;
 
     @NotNull(message = "{validation.name.NotEmpty}")
-    @Min(value = 15, message = "{validation.name.Size}")
+    @Min(value = 0, message = "{validation.name.Size}")
     @Max(value = 90, message = "{validation.name.Size}")
     private int age;
 
     @NotEmpty(message = "{validation.name.NotEmpty}")
-    @Length(min = 2,max = 50, message = "{validation.name.Size}")
+    @Length(min = 1,max = 50, message = "{validation.name.Size}")
     private String district;
 
     @NotEmpty(message = "{validation.name.NotEmpty}")
-    @Length(min = 2,max = 10, message = "{validation.name.Size}")
+    @Length(min = 1,max = 10, message = "{validation.name.Size}")
     private String gender;
     @ManyToOne
 //    @JsonIgnore

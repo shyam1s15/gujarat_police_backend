@@ -6,6 +6,8 @@ import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.ExcelException;
 import com.shyam.gujarat_police.services.DesignationService;
 import com.shyam.gujarat_police.services.PoliceStationService;
+import com.shyam.gujarat_police.util.ObjectUtil;
+import com.shyam.gujarat_police.util.RegExUtil;
 import com.shyam.gujarat_police.util.TextUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -86,27 +88,37 @@ public class ExcelHelper {
 
                 int cellIdx = 1;
                 try {
+                    cellsInRow.next();
                     while (cellsInRow.hasNext()) {
                         DataFormatter formatter = new DataFormatter(); //creating formatter using the default locale
                         Cell currentCell = cellsInRow.next();
-                        String cellValue = formatter.formatCellValue(currentCell); //Returns the formatted value of a cell as a String regardless of the cell type.
+                        String cellValue = formatter.formatCellValue(currentCell).trim(); //Returns the formatted value of a cell as a String regardless of the cell type.
 
 
                         switch (cellIdx) {
                             case PoliceIndex.POLICE_DESIGNATION -> {
+//                                System.out.println(cellValue);
                                 Designation designation = designationService.getDesignationByNameOrNameInGujarati(cellValue);
                                 police.setDesignation(designation);
                             }
                             case PoliceIndex.POLICE_FULLNAME -> police.setFullName(cellValue);
                             case PoliceIndex.POLICE_BUCKLE_NUMBER -> police.setBuckleNumber(cellValue);
-                            case PoliceIndex.POLICE_MOBILE_NUMBER -> police.setNumber(cellValue);
+                            case PoliceIndex.POLICE_MOBILE_NUMBER -> {
+                                if (RegExUtil.validPhone(cellValue)){
+                                    police.setNumber(cellValue);
+                                } else {
+                                    System.out.println(cellValue);
+                                    throw new ExcelException("Invalid phone number: " + cellValue);
+//                                    police.setNumber("0000000000");
+                                }
+                            }
                             case PoliceIndex.POLICE_STATION -> {
-                                PoliceStation policeStation = policeStationService.readSpecificByName(cellValue);
+                                PoliceStation policeStation = policeStationService.readSpecificByNameOrDemo(cellValue);
                                 police.setPoliceStation(policeStation);
                             }
                             case PoliceIndex.POLICE_DISTRICT -> police.setDistrict(cellValue);
                             case PoliceIndex.POLICE_GENDER -> police.setGender(cellValue);
-                            case PoliceIndex.POLICE_AGE -> police.setAge(Integer.parseInt(cellValue));
+                            case PoliceIndex.POLICE_AGE -> police.setAge(ObjectUtil.optIntegerDashToZero(cellValue,90));
                             default -> {
                                 logger.info("Unknown cell type: " + currentCell.getStringCellValue());
                             }

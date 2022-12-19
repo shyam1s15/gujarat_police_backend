@@ -48,6 +48,14 @@ public class ObjectUtil {
 		return defaultVal;
 	}
 
+	public static Integer optIntegerDashToZero(Object object, Integer defaultVal) {
+		String number = optString(object);
+		if (RegExUtil.isNumber(number)) {
+			return Integer.valueOf(number);
+		}
+		return defaultVal;
+	}
+
 	public static Short optShort(Object object) {
 		String number = optString(object);
 		if (RegExUtil.isNumber(number)) {

@@ -51,7 +51,10 @@ public class PoliceStationBaseRepositoryImpl extends BaseRepository<PoliceStatio
 //        List<Tuple> tupleList = query.getResultList();
 //        PoliceStation policeStation = new PoliceStation();
 //        Tuple tuple = tupleList.get(0);
-////        return policeStation;
+//        policeStation.setId(ObjectUtil.optLong(tuple.get("id")));
+//        policeStation.setPolice(tuple.get("police"));
+//        return policeStation;
+//        return query.getResultList().get(0);
 //    }
 
 }

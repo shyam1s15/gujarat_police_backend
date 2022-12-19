@@ -56,8 +56,21 @@ public class PoliceStationService {
     }
 
     public PoliceStation readSpecificByName(String stationName){
-        return policeStationRepository.findByPoliceStationName(stationName)
-                .orElseThrow(()-> new DataNotFoundException("No station found for stationName: " + stationName));
+        List<PoliceStation> policeStationListFromExcel = policeStationRepository.findbyPoliceStationNameOrNameInGuj(stationName);
+        if (policeStationListFromExcel.size() == 0 ){
+            throw new DataNotFoundException("No station found for stationName: " + stationName);
+        } else {
+            return policeStationListFromExcel.get(0);
+        }
+    }
+    public PoliceStation readSpecificByNameOrDemo(String stationName){
+        List<PoliceStation> policeStationListFromExcel = policeStationRepository.findbyPoliceStationNameOrNameInGuj(stationName);
+        if (policeStationListFromExcel.size() == 0 ){
+            return policeStationRepository.findByPoliceStationName("demo").orElseThrow(()->
+                    new DataNotFoundException("No station name found for station " + stationName));
+        } else {
+            return policeStationListFromExcel.get(0);
+        }
     }
 
     public void deletePoliceStation(Long stationId){

@@ -6,5 +6,4 @@ public interface PoliceStationBaseRepository {
     boolean isStationExists(PoliceStation station);
     boolean isStationExists(String stationName);
 
-//    PoliceStation findbyPoliceStationName(String stationName);
 }
