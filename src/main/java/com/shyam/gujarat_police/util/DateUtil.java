@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.util;
 
+import com.shyam.gujarat_police.exceptions.InvalidDateFormatException;
 import org.joda.time.DateTimeComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +26,9 @@ public class DateUtil {
 			if (!value.equals(sdf.format(date))) {
 				date = null;
 			}
-		} catch (ParseException ex) {
+		} catch (Exception ex) {
 			LOG.error("dateUtil", ex);
+			throw new InvalidDateFormatException("Invalid date format: " + value + " it should be dd/MM/yyyy" );
 		}
 		return date != null;
 	}
@@ -39,6 +41,7 @@ public class DateUtil {
 
 		} catch (Exception e) {
 			// TODO: handle exception
+			throw new InvalidDateFormatException("Invalid date format: " + schedule + " it should be dd/MM/yyyy" );
 		}
 		return date;
 	}

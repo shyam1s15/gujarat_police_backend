@@ -10,4 +10,6 @@ public interface AssignPoliceBaseRepository {
     List<Police> findFreePoliceOrNotAssigned(Date eventDate);
 
     List<Police> findFreePoliceOrNotAssignedByDesignation(DesignationCountDto designationCountDto);
+
+    boolean isPoliceAssigned(Long id, Date dutyStartDate, Long id1);
 }

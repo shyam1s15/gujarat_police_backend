@@ -1,9 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
-import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
-import com.shyam.gujarat_police.exceptions.DataInsertionException;
-import com.shyam.gujarat_police.exceptions.DataNotFoundException;
-import com.shyam.gujarat_police.exceptions.ExcelException;
+import com.shyam.gujarat_police.exceptions.*;
 import com.shyam.gujarat_police.response.APIResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -44,5 +41,15 @@ public class ExceptionController {
     public APIResponse dataInsertionException(DataInsertionException dataInsertionException){
 //        return new ResponseEntity<>(dataInsertionException.getMessage(), HttpStatus.EXPECTATION_FAILED);
         return APIResponse.error(dataInsertionException.getMessage());
+    }
+
+    @ExceptionHandler(value = InvalidDateFormatException.class)
+    public APIResponse invalidDateFormatException(InvalidDateFormatException dateFormatException){
+        return APIResponse.error(dateFormatException.getMessage());
+    }
+
+    @ExceptionHandler(value = PoliceAlreadyAssignedException.class)
+    public APIResponse policeAlreadyAssignedException(PoliceAlreadyAssignedException policeAlreadyAssignedException){
+        return APIResponse.error(policeAlreadyAssignedException.getMessage());
     }
 }

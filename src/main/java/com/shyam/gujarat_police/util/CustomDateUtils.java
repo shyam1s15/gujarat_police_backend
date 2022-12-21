@@ -17,7 +17,7 @@ import java.util.TimeZone;
 
 public class CustomDateUtils {
 
-	private static Date			  startDate;
+	private static Date	startDate;
 
 	private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("UTC");
 
