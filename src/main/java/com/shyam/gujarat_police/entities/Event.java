@@ -38,4 +38,15 @@ public class Event extends BaseModel {
     @JsonIgnore
     @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST)
     private List<AssignPolice> assignPolice;
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", eventName='" + eventName + '\'' +
+                ", eventDetails='" + eventDetails + '\'' +
+                ", eventStartDate=" + eventStartDate +
+                ", eventEndDate=" + eventEndDate +
+                '}';
+    }
 }

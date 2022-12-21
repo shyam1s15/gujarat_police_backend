@@ -13,6 +13,7 @@ import com.shyam.gujarat_police.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -70,6 +71,47 @@ public class AssignPoliceService {
     }
 
 
+    public AssignPolice saveAssignPoliceV2(AssignPoliceDto dto) {
+        List<Event> eventsBetweenGivenEvent = eventService.getEventsBetweenGivenEvent(dto.getEventId());
+        List<Long> eventIds = eventsBetweenGivenEvent.stream().map(Event::getId).toList();
+        // if exists police, point and event.
+        Police police = policeService.readSpecific(dto.getPoliceId());
+        Point point = pointService.readSpecific(dto.getPointId());
+        Event event = eventService.readSpecific(dto.getEventId());
+        if (Objects.nonNull(police)
+                && Objects.nonNull(point)
+                && Objects.nonNull(event)) {
+            AssignPolice assignPolice = new AssignPolice();
+            if (DateUtil.isValidFormat("dd/MM/yyyy", dto.getAssignedDate())) {
+                assignPolice.setAssignedDate(DateUtil.stringToDate("dd/MM/yyyy", dto.getAssignedDate()));
+            }
+            if (DateUtil.isValidFormat("dd/MM/yyyy", dto.getDutyStartDate())) {
+                Calendar cal = Calendar.getInstance(); // creates calendar
+                cal.setTime(DateUtil.stringToDate("dd/MM/yyyy", dto.getDutyStartDate()));               // sets calendar time/date
+                cal.add(Calendar.HOUR_OF_DAY, 6);      // adds one hour
+                assignPolice.setDutyStartDate(cal.getTime());
+            }
+            if (DateUtil.isValidFormat("dd/MM/yyyy", dto.getDutyEndDate())) {
+                assignPolice.setDutyEndDate(DateUtil.stringToDate("dd/MM/yyyy", dto.getDutyEndDate()));
+            }
+
+            assignPolice.setPolice(police);
+            assignPolice.setPoint(point);
+            assignPolice.setEvent(event);
+
+            if (!isPoliceAssignedV2(assignPolice, eventIds)){
+                System.out.println(eventsBetweenGivenEvent);
+                return assignPoliceRepository.save(assignPolice);
+//                return assignPolice;
+            } else {
+                throw new PoliceAlreadyAssignedException("Police already assigned");
+            }
+        } else {
+            throw new DataSavingException("Could not save assigned police information with police id " + dto.getPoliceId());
+        }
+    }
+
+
     public AssignPolice updateAssignPolice(AssignPolice assignPolice, Long assignPoliceId) {
         if (Objects.isNull(assignPoliceId)) {
             throw new DataNotFoundException("assignPoliceId is null for id " + assignPoliceId);
@@ -102,14 +144,23 @@ public class AssignPoliceService {
         // if duty start date > event end date then assign
         // if duty start date > last event end date then assign
 
-        // select * from assign police where
-        // p.id not in  assign.pid
-        // or assigndate > assign.eid.
-        boolean result = assignPoliceRepository.isPoliceAssignedV3(assignPolice.getPolice().getId() ,assignPolice.getDutyStartDate(), assignPolice.getEvent().getId());
+        boolean result = assignPoliceRepository.isPoliceAssignedForSpecificEvent(assignPolice.getPolice().getId() ,assignPolice.getDutyStartDate(), assignPolice.getEvent().getId());
         if (Objects.nonNull(result)){
             return result;
         } else {
             return false;
         }
     }
+
+    private boolean isPoliceAssignedV2(AssignPolice assignPolice, List<Long> eventIds) {
+        // if police not in assign police then assign
+        // if duty start date > event end date then assign
+        // if duty start date > last event end date then assign
+        System.out.println(eventIds);
+        System.out.println("duty start date: " + assignPolice.getDutyStartDate());
+        int result = assignPoliceRepository.isPoliceAssignedForSpecificEvents(assignPolice.getPolice().getId() ,assignPolice.getDutyStartDate(), eventIds);
+        System.out.println(result);
+        return result > 0;
+    }
+
 }

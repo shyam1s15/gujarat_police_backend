@@ -25,4 +25,9 @@ public class AssignPoliceController {
         AssignPolice dto = assignPoliceService.saveAssignPolice(assignPolice);
         return APIResponse.ok(dto);
     }
+    @PostMapping("/V2")
+    public APIResponse saveAssignPoliceV2(@RequestBody AssignPoliceDto assignPolice){
+        AssignPolice dto = assignPoliceService.saveAssignPoliceV2(assignPolice);
+        return APIResponse.ok(dto);
+    }
 }

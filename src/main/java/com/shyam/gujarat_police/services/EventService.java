@@ -48,4 +48,10 @@ public class EventService {
     public void deleteEvent(Long eventId){
         eventRepository.deleteById(eventId);
     }
+
+    public List<Event> getEventsBetweenGivenEvent(long eventId) {
+        Event event = eventRepository.findById(eventId).
+                orElseThrow(()->new DataNotFoundException("Event not found with id: " + eventId));
+        return eventRepository.getEventsBetweenGivenEvent(event.getEventStartDate(), event.getEventEndDate());
+    }
 }
