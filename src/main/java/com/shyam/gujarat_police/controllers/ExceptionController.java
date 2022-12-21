@@ -52,4 +52,9 @@ public class ExceptionController {
     public APIResponse policeAlreadyAssignedException(PoliceAlreadyAssignedException policeAlreadyAssignedException){
         return APIResponse.error(policeAlreadyAssignedException.getMessage());
     }
+
+    @ExceptionHandler(value = DateMisMatchException.class)
+    public APIResponse dateMisMatchException(DateMisMatchException dateMisMatchException){
+        return APIResponse.error(dateMisMatchException.getMessage());
+    }
 }

@@ -7,6 +7,7 @@ import com.shyam.gujarat_police.entities.Point;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.exceptions.DataSavingException;
+import com.shyam.gujarat_police.exceptions.DateMisMatchException;
 import com.shyam.gujarat_police.exceptions.PoliceAlreadyAssignedException;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.util.DateUtil;
@@ -93,6 +94,11 @@ public class AssignPoliceService {
             }
             if (DateUtil.isValidFormat("dd/MM/yyyy", dto.getDutyEndDate())) {
                 assignPolice.setDutyEndDate(DateUtil.stringToDate("dd/MM/yyyy", dto.getDutyEndDate()));
+            }
+
+            // check if duty dates is in range of event date.
+            if (!(event.getEventStartDate().before(assignPolice.getDutyStartDate()) && event.getEventEndDate().after(assignPolice.getDutyEndDate()))) {
+                throw new DateMisMatchException("Date is not in range of event date : " + event.getEventStartDate() + " : " + event.getEventEndDate() + " police assignment dates : " + assignPolice.getDutyStartDate() + " " + assignPolice.getDutyEndDate());
             }
 
             assignPolice.setPolice(police);
