@@ -43,8 +43,6 @@ public class ExcelHelper {
         public static final int POLICESTATION_DISTRICT_IN_GUJ = 3;
         public static final int POLICESTATION_NAME = 4;
         public static final int POLICESTATION_NAME_IN_GUJ = 5;
-
-
     }
 
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
