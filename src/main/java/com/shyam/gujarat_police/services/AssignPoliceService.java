@@ -1,23 +1,17 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.AssignPoliceByDesignationCountDto;
 import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
-import com.shyam.gujarat_police.entities.AssignPolice;
-import com.shyam.gujarat_police.entities.Event;
-import com.shyam.gujarat_police.entities.Point;
-import com.shyam.gujarat_police.entities.Police;
-import com.shyam.gujarat_police.exceptions.DataNotFoundException;
-import com.shyam.gujarat_police.exceptions.DataSavingException;
-import com.shyam.gujarat_police.exceptions.DateMisMatchException;
-import com.shyam.gujarat_police.exceptions.PoliceAlreadyAssignedException;
+import com.shyam.gujarat_police.dto.request.EventAndPointIdDto;
+import com.shyam.gujarat_police.dto.request.EventIdDto;
+import com.shyam.gujarat_police.entities.*;
+import com.shyam.gujarat_police.exceptions.*;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AssignPoliceService {
@@ -33,6 +27,9 @@ public class AssignPoliceService {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private DesignationService designationService;
 
     public List<AssignPolice> getAllAssignedPolice() {
         return (List<AssignPolice>) assignPoliceRepository.findAll();
@@ -164,9 +161,83 @@ public class AssignPoliceService {
         // if duty start date > last event end date then assign
         System.out.println(eventIds);
         System.out.println("duty start date: " + assignPolice.getDutyStartDate());
-        int result = assignPoliceRepository.isPoliceAssignedForSpecificEvents(assignPolice.getPolice().getId() ,assignPolice.getDutyStartDate(), eventIds);
-        System.out.println(result);
-        return result > 0;
+        // past code
+//        int result = assignPoliceRepository.isPoliceAssignedForSpecificEvents(assignPolice.getPolice().getId() ,assignPolice.getDutyStartDate(), eventIds);
+        return assignPoliceRepository.isPoliceAssignedForSpecificEvents(assignPolice.getPolice().getId() ,assignPolice.getDutyStartDate(), eventIds);
+//        System.out.println(result);
+//        return result > 0;
     }
 
+
+    public Long countPoliceInEvent(EventIdDto dto) {
+        // check if event exists else throw
+        Event eventOptional = eventService.readSpecific(dto.getEventId());
+        return assignPoliceRepository.countPoliceInEvent(dto.getEventId());
+    }
+
+    public Long countPoliceByEventAndPoint(EventAndPointIdDto dto) {
+        // check if event exists else throw
+        Event eventOptional = eventService.readSpecific(dto.getEventId());
+        return assignPoliceRepository.countPoliceByEventAndPoint(dto.getEventId(), dto.getPointId());
+    }
+
+    /**
+     * @author shyam
+     *
+     *
+     * */
+    public List<AssignPolice> saveAssignPoliceByDesignation(AssignPoliceByDesignationCountDto dto) {
+        // check if event exists
+        Event event = eventService.readSpecific(dto.getEventId());
+        // check if point exists
+        Point point = pointService.readSpecific(dto.getPointId());
+
+        // check if designation exists
+        Designation designation = designationService.getDesignationByNameOrNameInGujarati(dto.getDesignationName());
+//        Date dutyStartDate = new Date();
+        Date dutyStartDate = DateUtil.stringToDate("dd/MM/yyyy", dto.getDutyStartDate());
+        Date dutyEndDate = DateUtil.stringToDate("dd/MM/yyyy", dto.getDutyEndDate());
+        Date assignedDate = DateUtil.stringToDate("dd/MM/yyyy", dto.getAssignedDate());
+
+        // find available police in these designations
+        // we have to first find all police with designation and search them all
+//        List<Long> policeWithDesignationIds = designation.getPolice().stream().map(Police::getId).toList();
+        List<Police> policeWithDesignation = designation.getPolice();
+
+        if (policeWithDesignation.size() == 0 ){
+            throw new DataNotFoundException("No police associated with designation " + designation.getName() );
+        }
+
+        // get all events occuring between given event.
+        List<Event> eventsBetweenGivenEvent = eventService.getEventsBetweenGivenEvent(dto.getEventId());
+        List<Long> eventIds = eventsBetweenGivenEvent.stream().map(Event::getId).toList();
+
+//        if (DateUtil.isValidFormat("dd/MM/yyyy", dto.getDutyStartDate())) {
+//            Calendar cal = Calendar.getInstance(); // creates calendar
+//            cal.setTime(DateUtil.stringToDate("dd/MM/yyyy", dto.getDutyStartDate()));               // sets calendar time/date
+//            cal.add(Calendar.HOUR_OF_DAY, 6);      // adds one hour
+//            dutyStartDate = cal.getTime();
+//        }
+        // check if these police are free
+        List<Police> availablePoliceIdsWithDesignation = new ArrayList<>(policeWithDesignation.stream().filter(police -> !assignPoliceRepository.isPoliceAssignedForSpecificEvents(police.getId(), dutyStartDate, eventIds)).toList());
+        if (dto.getPoliceCount() > availablePoliceIdsWithDesignation.size()) {
+            throw new InsufficientDataException("Insufficient police Only " + availablePoliceIdsWithDesignation.size() + " police is available out of " + dto.getPoliceCount());
+        }
+        Collections.shuffle(availablePoliceIdsWithDesignation);
+        List<AssignPolice> assignedPoliceList = new ArrayList<AssignPolice>();
+
+        for(int i = 0; i < dto.getPoliceCount(); i++){
+            AssignPolice assignPolice = new AssignPolice();
+            assignPolice.setEvent(event);
+            assignPolice.setPoint(point);
+            assignPolice.setDutyStartDate(dutyStartDate);
+            assignPolice.setDutyEndDate(dutyEndDate);
+            assignPolice.setAssignedDate(assignedDate);
+            assignPolice.setPolice(availablePoliceIdsWithDesignation.get(i));
+            assignedPoliceList.add(assignPolice);
+        }
+        assignPoliceRepository.saveAll(assignedPoliceList);
+        return assignedPoliceList;
+    }
+    // new logic event na assigned police designation na police ma compare karo ne, jo amma na hoi toh lai lyo.
 }

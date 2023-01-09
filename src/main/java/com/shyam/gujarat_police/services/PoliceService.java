@@ -106,9 +106,11 @@ public class PoliceService {
         return uniquePolice.size();
     }
 
-
     private boolean isPoliceExists(Police station){
         return policeRepository.isPoliceExists(station);
     }
 
+    public APIResponse countPolice() {
+        return APIResponse.ok(policeRepository.count());
+    }
 }

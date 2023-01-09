@@ -57,4 +57,8 @@ public class ExceptionController {
     public APIResponse dateMisMatchException(DateMisMatchException dateMisMatchException){
         return APIResponse.error(dateMisMatchException.getMessage());
     }
+    @ExceptionHandler(value = InsufficientDataException.class)
+    public APIResponse insufficientDataException(InsufficientDataException insufficientDataException){
+        return APIResponse.error(insufficientDataException.getMessage());
+    }
 }

@@ -1,11 +1,16 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.dto.request.AssignPoliceByDesignationCountDto;
 import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
+import com.shyam.gujarat_police.dto.request.EventAndPointIdDto;
+import com.shyam.gujarat_police.dto.request.EventIdDto;
 import com.shyam.gujarat_police.entities.AssignPolice;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.AssignPoliceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -29,5 +34,23 @@ public class AssignPoliceController {
     public APIResponse saveAssignPoliceV2(@RequestBody AssignPoliceDto assignPolice){
         AssignPolice dto = assignPoliceService.saveAssignPoliceV2(assignPolice);
         return APIResponse.ok(dto);
+    }
+
+    @GetMapping("/count-police-in-event")
+    public APIResponse countPoliceInEvent(@RequestBody EventIdDto dto){
+        Long respDto = assignPoliceService.countPoliceInEvent(dto);
+        return APIResponse.ok(respDto);
+    }
+
+    @GetMapping("/count-police-in-point-event")
+    public APIResponse countPoliceByEventAndPoint(@RequestBody EventAndPointIdDto dto){
+        Long respDto = assignPoliceService.countPoliceByEventAndPoint(dto);
+        return APIResponse.ok(respDto);
+    }
+
+    @PostMapping("by-designation")
+    public APIResponse saveAssignPoliceByDesignation(@RequestBody AssignPoliceByDesignationCountDto dto){
+        List<AssignPolice> respDto = assignPoliceService.saveAssignPoliceByDesignation(dto);
+        return APIResponse.ok(respDto);
     }
 }

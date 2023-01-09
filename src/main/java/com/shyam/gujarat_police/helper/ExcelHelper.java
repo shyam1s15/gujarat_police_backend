@@ -172,7 +172,7 @@ public class ExcelHelper {
                         }
                         DataFormatter formatter = new DataFormatter(); //creating formatter using the default locale
 
-                        String cellValue = formatter.formatCellValue(currentCell); //Returns the formatted value of a cell as a String regardless of the cell type.
+                        String cellValue = formatter.formatCellValue(currentCell).trim(); //Returns the formatted value of a cell as a String regardless of the cell type.
 
                         switch (cellIdx) {
                             case PoliceStationIndex.POLICESTATION_DISTRICT -> {

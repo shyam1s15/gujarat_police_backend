@@ -73,7 +73,6 @@ public class PoliceStationController {
     public APIResponse getPoliceStationInDistTalukaAndName(){
         List<DistrictTalukaAndPoliceStationNameRespDto> dto = policeStationService.getDistrictTalukaAndPoliceStation();
         return APIResponse.ok(dto);
-
     }
 
 }

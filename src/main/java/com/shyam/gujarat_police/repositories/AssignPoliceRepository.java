@@ -14,9 +14,19 @@ public interface AssignPoliceRepository extends PagingAndSortingRepository<Assig
     @Query("select count(asp) > 0 from AssignPolice asp where asp.police.id = :pId and (asp.event.id = :eId and :dutyStartDate >= asp.event.eventStartDate) ")
     boolean isPoliceAssignedForSpecificEvent(Long pId, Date dutyStartDate, Long eId);
 
-    @Query("select count(asp) from AssignPolice asp where asp.police.id = :pId and (asp.event.id IN (:eventIds) and :dutyStartDate >= asp.event.eventStartDate) ")
+    @Query("select count(asp)>0 from AssignPolice asp where asp.police.id = :pId and (asp.event.id IN (:eventIds) and :dutyStartDate >= asp.event.eventStartDate) ")
 //    @Query("select count(asp) from AssignPolice asp where asp.event.id IN (:eventIds) and :pId=:pId and :dutyStartDate = :dutyStartDate")
-    int isPoliceAssignedForSpecificEvents(Long pId, Date dutyStartDate, List<Long> eventIds);
+    Boolean isPoliceAssignedForSpecificEvents(Long pId, Date dutyStartDate, List<Long> eventIds);
+
+    @Query("select count(asp) from AssignPolice asp where asp.event.id = :eventId")
+    Long countPoliceInEvent(Long eventId);
+
+    @Query("select count(asp) from AssignPolice asp where asp.event.id = :eventId and asp.point.id = :pointId")
+    Long countPoliceByEventAndPoint(Long eventId, Long pointId);
+
+//    @Query("select asp. from AssignPolice asp where asp.event.id In (:eventIds) and ")
+//    List<Long> findAvailablePoliceIds(List<Long> eventIds, List<Long> policeWithDesignationIds);
+
 
     // at max it can only give one police assign details
 //    @Query("select count(asp) > 0 from AssignPolice asp where asp.police.id = :pId and :dutyStartDate >= asp.event.eventEndDate and event.startDate >= :currentDate")
