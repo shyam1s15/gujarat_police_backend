@@ -1,6 +1,8 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.PointDto;
 import com.shyam.gujarat_police.entities.Point;
+import com.shyam.gujarat_police.entities.Zone;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.PointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +14,23 @@ import java.util.List;
 public class PointService {
     @Autowired
     private PointRepository pointRepository;
+
+    @Autowired
+    private ZoneService zoneService;
+
     public List<Point> getPoints() {
         return (List<Point>) pointRepository.findAll();
     }
 
-    public Point savePoint(Point point) {
+    public Point savePoint(PointDto dto) {
+        Point point = new Point();
+        point.setPointName(dto.getPointName());
+        point.setTaluka(dto.getTaluka());
+        point.setDistrict(dto.getDistrict());
+        point.setAccessories(dto.getAccessories());
+        point.setRemarks(dto.getRemarks());
+        Zone zone = zoneService.readSpecifiZone(dto.getZone());
+        point.setZone(zone);
         return pointRepository.save(point);
     }
 

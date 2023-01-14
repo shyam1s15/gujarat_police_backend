@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.dto.request.PointDto;
 import com.shyam.gujarat_police.entities.Point;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.PointService;
@@ -22,9 +23,9 @@ public class PointController {
     }
 
     @PostMapping("/")
-    public APIResponse savePoint(@RequestBody @Valid Point point) {
-        Point dto = pointService.savePoint(point);
-        return APIResponse.ok(dto);
+    public APIResponse savePoint(@RequestBody @Valid PointDto dto) {
+        Point resp = pointService.savePoint(dto);
+        return APIResponse.ok(resp);
     }
 
     @PutMapping("/{pointId}")
