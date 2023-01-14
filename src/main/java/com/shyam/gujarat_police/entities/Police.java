@@ -50,4 +50,10 @@ public class Police extends BaseModel {
 //    @JsonIgnore
     @NotNull(message = "{validation.name.NotEmpty}")
     private Designation designation;
+
+    @ManyToOne
+//    @JsonIgnore
+    @JoinColumn(name = "event_id")
+    @NotNull(message = "{validation.name.NotEmpty}")
+    private Event event;
 }

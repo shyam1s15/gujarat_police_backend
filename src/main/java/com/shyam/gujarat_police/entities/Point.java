@@ -30,6 +30,16 @@ public class Point extends BaseModel {
     @NotEmpty(message = "{validation.name.NotEmpty}")
     private String pointName;
 
+//    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String accessories;
+
+//    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String remarks;
+
+    @ManyToOne
+    @JoinColumn(name = "zone_id")
+    private Zone zone;
+
     @JsonIgnore
     @OneToMany(mappedBy = "point", cascade = CascadeType.PERSIST)
     private List<AssignPolice> assignPolice;
