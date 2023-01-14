@@ -26,7 +26,7 @@ public class EventPoliceCount {
     private Event event;
 
     @NotEmpty(message = "{validation.name.NotEmpty}")
-    private String designation_name;
+    private Long designationId;
 
-    private Integer designation_count;
+    private Integer designationCount;
 }

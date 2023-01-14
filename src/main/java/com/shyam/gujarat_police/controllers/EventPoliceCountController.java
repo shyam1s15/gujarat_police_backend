@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.dto.request.EventPoliceCountDto;
 import com.shyam.gujarat_police.entities.EventPoliceCount;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.EventPoliceCountService;
@@ -24,9 +25,9 @@ public class EventPoliceCountController {
     }
 
     @PostMapping("/")
-    public APIResponse saveEventPoliceCount(@RequestBody @Valid EventPoliceCount eventPoliceCount){
-        EventPoliceCount dto = eventPoliceCountService.saveEventPoliceCount(eventPoliceCount);
-        return APIResponse.ok(dto);
+    public APIResponse saveEventPoliceCount(@RequestBody @Valid EventPoliceCountDto dto){
+        EventPoliceCount resp = eventPoliceCountService.saveEventPoliceCount(dto);
+        return APIResponse.ok(resp);
     }
 
     @PutMapping("/{eventPoliceCountId}")
