@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.DesignationListDto;
 import com.shyam.gujarat_police.dto.request.FindByDesignationDto;
 import com.shyam.gujarat_police.entities.Designation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
@@ -9,6 +10,7 @@ import com.shyam.gujarat_police.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -96,4 +98,17 @@ public class DesignationService {
         return designations.get(0);
     }
 
+    public List<Designation> saveDesignationsFromList(DesignationListDto dto) {
+        List<Designation> designationList = dto.getDesignationsList();
+        List<Designation> savedDesignations = new ArrayList<>();
+        for (Designation designation : designationList) {
+            boolean result = isDesignationExist(designation.getName(),
+                    designation.getNameInGujarati());
+            if (!result) {
+                Designation d = designationRepository.save(designation);
+                savedDesignations.add(d);
+            }
+        }
+        return savedDesignations;
+    }
 }

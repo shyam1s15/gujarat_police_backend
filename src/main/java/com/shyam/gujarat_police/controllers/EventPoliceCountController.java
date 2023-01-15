@@ -31,7 +31,7 @@ public class EventPoliceCountController {
     }
 
     @PutMapping("/{eventPoliceCountId}")
-    public APIResponse updateEventPoliceCount(@RequestBody @Valid EventPoliceCount eventPoliceCount,
+    public APIResponse updateEventPoliceCount(@RequestBody @Valid EventPoliceCountDto eventPoliceCount,
                                    @PathVariable("eventPoliceCountId") Long eventPoliceCountId){
         EventPoliceCount dto = eventPoliceCountService.updateEventPoliceCount(eventPoliceCount, eventPoliceCountId);
         return APIResponse.ok(dto);

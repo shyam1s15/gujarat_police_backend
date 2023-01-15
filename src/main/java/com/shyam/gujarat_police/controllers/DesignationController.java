@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.dto.request.DesignationListDto;
 import com.shyam.gujarat_police.dto.request.FindByDesignationDto;
 import com.shyam.gujarat_police.entities.Designation;
 import com.shyam.gujarat_police.response.APIResponse;
@@ -27,6 +28,11 @@ public class DesignationController {
     @PostMapping("/")
     public APIResponse saveDesignation(@RequestBody @NotNull @Valid Designation designation) {
         Designation dto = designationService.saveDesignation(designation);
+        return APIResponse.ok(dto);
+    }
+    @PostMapping("/in-bulk")
+    public APIResponse saveDesignationInBulk(@RequestBody DesignationListDto designationList) {
+        List<Designation> dto = designationService.saveDesignationsFromList(designationList);
         return APIResponse.ok(dto);
     }
 
