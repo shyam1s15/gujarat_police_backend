@@ -7,7 +7,6 @@ import com.shyam.gujarat_police.services.EventPoliceCountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -39,11 +38,16 @@ public class EventPoliceCountController {
         return APIResponse.ok(resp);
     }
 
+//    @PutMapping("/{eventPoliceCountId}")
+//    public APIResponse updateEventPoliceCount(@RequestBody @Valid EventPoliceCountDto eventPoliceCount,
+//                                   @PathVariable("eventPoliceCountId") Long eventPoliceCountId){
+//        EventPoliceCount dto = eventPoliceCountService.updateEventPoliceCount(eventPoliceCount, eventPoliceCountId);
+//        return APIResponse.ok(dto);
+//    }
     @PutMapping("/{eventPoliceCountId}")
-    public APIResponse updateEventPoliceCount(@RequestBody @Valid EventPoliceCountDto eventPoliceCount,
-                                   @PathVariable("eventPoliceCountId") Long eventPoliceCountId){
-        EventPoliceCount dto = eventPoliceCountService.updateEventPoliceCount(eventPoliceCount, eventPoliceCountId);
-        return APIResponse.ok(dto);
+    public APIResponse updateMultipleEventPoliceCount(@RequestBody Map<String,Object> body){
+        List<EventPoliceCount> resp = eventPoliceCountService.updateMultipleEventPoliceCount(body);
+        return APIResponse.ok(resp);
     }
 
     @DeleteMapping("/{eventPoliceCountId}")

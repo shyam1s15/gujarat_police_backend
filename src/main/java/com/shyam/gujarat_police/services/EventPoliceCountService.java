@@ -52,27 +52,28 @@ public class EventPoliceCountService {
         }
     }
 
-    public EventPoliceCount updateEventPoliceCount(EventPoliceCountDto dto, Long eventPoliceCountId) {
-        if (Objects.isNull(eventPoliceCountId)){
-            throw new DataNotFoundException("EventPoliceCount id not found with id " + eventPoliceCountId);
-        }
-        Optional<EventPoliceCount> optionalEventPoliceCount = eventPoliceCountRespository.findById(eventPoliceCountId);
-        if (optionalEventPoliceCount.isEmpty()) {
-            throw new DataNotFoundException("EventPoliceCount not found with id " + eventPoliceCountId);
-        } else {
-            EventPoliceCount obtainedObj = optionalEventPoliceCount.get();
-
-            // check event exists
-            // check designation exists
-            designationService.getDesignationById(dto.getDesignationId());
-            Event event = eventService.readSpecific(dto.getEventId());
-
-            obtainedObj.setDesignationCount(dto.getDesignationCount());
-            obtainedObj.setDesignationId(dto.getDesignationId());
-            obtainedObj.setEvent(event);
-            return eventPoliceCountRespository.save(obtainedObj);
-        }
-    }
+    // update code for individual eventPoliceCount, we need for entire event so making another code.
+//    public EventPoliceCount updateEventPoliceCount(EventPoliceCountDto dto, Long eventPoliceCountId) {
+//        if (Objects.isNull(eventPoliceCountId)){
+//            throw new DataNotFoundException("EventPoliceCount id not found with id " + eventPoliceCountId);
+//        }
+//        Optional<EventPoliceCount> optionalEventPoliceCount = eventPoliceCountRespository.findById(eventPoliceCountId);
+//        if (optionalEventPoliceCount.isEmpty()) {
+//            throw new DataNotFoundException("EventPoliceCount not found with id " + eventPoliceCountId);
+//        } else {
+//            EventPoliceCount obtainedObj = optionalEventPoliceCount.get();
+//
+//            // check event exists
+//            // check designation exists
+//            designationService.getDesignationById(dto.getDesignationId());
+//            Event event = eventService.readSpecific(dto.getEventId());
+//
+//            obtainedObj.setDesignationCount(dto.getDesignationCount());
+//            obtainedObj.setDesignationId(dto.getDesignationId());
+//            obtainedObj.setEvent(event);
+//            return eventPoliceCountRespository.save(obtainedObj);
+//        }
+//    }
 
     public void deleteEventPoliceCount(Long eventPoliceCountId) {
         eventPoliceCountRespository.deleteById(eventPoliceCountId);
@@ -106,6 +107,42 @@ public class EventPoliceCountService {
             EventPoliceCount eventPoliceCount = saveEventPoliceCountIndividual(dto, Boolean.FALSE);
             System.out.println(eventPoliceCount.getDesignationId());
             resp.add(eventPoliceCount);
+        }
+        return (List<EventPoliceCount>) CollectionUtil.makeCollection(eventPoliceCountRespository.saveAll(resp));
+    }
+
+    public List<EventPoliceCount> updateMultipleEventPoliceCount(Map<String, Object> body) {
+        List<EventPoliceCount> resp = new ArrayList<>();
+
+        Event event = eventService.readSpecific(Long.valueOf(body.get("event-id").toString()));
+        Map<String, String> designationCounts = (Map<String, String>) body.get("designations");
+        // TODO:event validation check in eventPoliceCount, if exists then data already there please try update methood
+         List<EventPoliceCount> eventPoliceCounts = eventPoliceCountRespository.getAllByEvent(event.getId());
+
+         List<EventPoliceCount> oldEventPoliceCounts = new ArrayList<>();
+        List<EventPoliceCount> newEventPoliceCounts = new ArrayList<>();
+
+        // if designation id exists then update, otherwise add.
+        for (Map.Entry<String, String> designationCount : designationCounts.entrySet()){
+            Long designationId = Long.parseLong(designationCount.getKey());
+            Integer count = Integer.parseInt(designationCount.getValue());
+
+            EventPoliceCountDto dto = new EventPoliceCountDto();
+            dto.setEventId(event.getId());
+            dto.setDesignationId(designationId);
+            dto.setDesignationCount(count);
+            EventPoliceCount eventPoliceCount = saveEventPoliceCountIndividual(dto, Boolean.FALSE);
+            boolean isDesignationPreviouslyExists = false;
+            for(EventPoliceCount oldEventPoliceCount : eventPoliceCounts){
+                if (Objects.equals(oldEventPoliceCount.getId(), designationId)){
+                    isDesignationPreviouslyExists = true;
+                    oldEventPoliceCount.setDesignationCount(count);
+                    resp.add(oldEventPoliceCount);
+                }
+            }
+            if (!isDesignationPreviouslyExists){
+                resp.add(eventPoliceCount);
+            }
         }
         return (List<EventPoliceCount>) CollectionUtil.makeCollection(eventPoliceCountRespository.saveAll(resp));
     }
