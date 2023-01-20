@@ -61,4 +61,9 @@ public class ExceptionController {
     public APIResponse insufficientDataException(InsufficientDataException insufficientDataException){
         return APIResponse.error(insufficientDataException.getMessage());
     }
+
+    @ExceptionHandler(value = DataSavingException.class)
+    public APIResponse dataSavingException(DataSavingException dataSavingException){
+        return APIResponse.error(dataSavingException.getMessage());
+    }
 }

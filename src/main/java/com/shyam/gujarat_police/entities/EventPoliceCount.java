@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
@@ -25,7 +24,7 @@ public class EventPoliceCount {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @NotEmpty(message = "{validation.name.NotEmpty}")
+//    @NotEmpty(message = "{validation.name.NotEmpty}")
     private Long designationId;
 
     private Integer designationCount;

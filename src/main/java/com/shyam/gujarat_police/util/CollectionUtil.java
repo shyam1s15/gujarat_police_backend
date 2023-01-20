@@ -82,4 +82,12 @@ public class CollectionUtil {
 	public static <R> R pickRandom(List<R> list) {
 		return list.get(random(0, list.size() - 1));
 	}
+
+	public static <E> Collection<E> makeCollection(Iterable<E> iter) {
+		Collection<E> list = new ArrayList<E>();
+		for (E item : iter) {
+			list.add(item);
+		}
+		return list;
+	}
 }

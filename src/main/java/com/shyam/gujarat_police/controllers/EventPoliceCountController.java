@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -16,7 +17,7 @@ import java.util.List;
 public class EventPoliceCountController {
 
     @Autowired
-    EventPoliceCountService eventPoliceCountService;
+    private EventPoliceCountService eventPoliceCountService;
 
     @GetMapping("/")
     public APIResponse getAllEventsPoliceCount(){
@@ -24,9 +25,17 @@ public class EventPoliceCountController {
         return APIResponse.ok(resp);
     }
 
-    @PostMapping("/")
-    public APIResponse saveEventPoliceCount(@RequestBody @Valid EventPoliceCountDto dto){
-        EventPoliceCount resp = eventPoliceCountService.saveEventPoliceCount(dto);
+//    @PostMapping("/")
+//    public APIResponse saveEventPoliceCount(@RequestParam(value = "event-id") Long eventId, @RequestParam Map<Long, Long> designationCount){
+    @RequestMapping(value="/",
+        method=RequestMethod.POST)
+    public APIResponse saveMultipleEventPoliceCount(@RequestBody Map<String,Object> body){
+        List<EventPoliceCount> resp = eventPoliceCountService.saveMultipleEventPoliceCount(body);
+        return APIResponse.ok(resp);
+    }
+
+    public APIResponse saveEventPoliceCountIndividual(@RequestBody EventPoliceCountDto dto){
+        EventPoliceCount resp = eventPoliceCountService.saveEventPoliceCountIndividual(dto, Boolean.TRUE);
         return APIResponse.ok(resp);
     }
 
@@ -43,9 +52,15 @@ public class EventPoliceCountController {
         return APIResponse.ok("Event deleted successfully with id " + eventPoliceCountId);
     }
 
-    @GetMapping("/{eventPoliceCountId}/")
-    public APIResponse readSpecific(@PathVariable("eventPoliceCountId") Long eventPoliceCountId){
-        EventPoliceCount dto = eventPoliceCountService.readSpecific(eventPoliceCountId);
+//    @GetMapping("/{eventPoliceCountId}")
+//    public APIResponse readSpecific(@PathVariable("eventPoliceCountId") Long eventPoliceCountId){
+//        EventPoliceCount dto = eventPoliceCountService.readSpecific(eventPoliceCountId);
+//        return APIResponse.ok(dto);
+//    }
+
+    @GetMapping("/{eventId}")
+    public APIResponse readAllByEvent(@PathVariable("eventId") Long eventId){
+        List<EventPoliceCount> dto = eventPoliceCountService.readAllByEvent(eventId);
         return APIResponse.ok(dto);
     }
 }
