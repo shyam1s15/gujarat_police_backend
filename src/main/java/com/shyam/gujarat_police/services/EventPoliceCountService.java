@@ -1,6 +1,8 @@
 package com.shyam.gujarat_police.services;
 
 import com.shyam.gujarat_police.dto.request.EventPoliceCountDto;
+import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
+import com.shyam.gujarat_police.dto.response.EventPoliceCountAssignmentRowDto;
 import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.EventPoliceCount;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
@@ -157,5 +159,38 @@ public class EventPoliceCountService {
         } else {
             return data;
         }
+    }
+
+    public EventPoliceCountAssignmentRowDto readAllByEventDesignationCountsAndEventName(Long eventId) {
+        // check event exists
+        Event event = eventService.readSpecific(eventId);
+        // check if data exists
+        List<EventPoliceCount> data = eventPoliceCountRespository.getAllByEvent(eventId);
+        if (data.size() == 0) {
+            throw new DataNotFoundException("No data found for event " + event.getEventName());
+        }
+        EventPoliceCountAssignmentRowDto resp = new EventPoliceCountAssignmentRowDto();
+        resp.setEventId(eventId);
+        resp.setEventName(event.getEventName());
+        List<DesignationCountRespDto> designationCountRespDtos = new ArrayList<>();
+        data.forEach(eventPoliceCount -> {
+            DesignationCountRespDto dto = new DesignationCountRespDto();
+            dto.setDesignationId(eventPoliceCount.getDesignationId());
+            dto.setDesignationName(designationService.getDesignationById(eventPoliceCount.getDesignationId()).getName());
+            dto.setDesignationCount(eventPoliceCount.getDesignationCount());
+            designationCountRespDtos.add(dto);
+        });
+        resp.setAssignments(designationCountRespDtos);
+        return resp;
+    }
+
+    public List<EventPoliceCountAssignmentRowDto> readAllInAssignmentFormat() {
+        List<Long> eventIds = eventPoliceCountRespository.getAllEventIds();
+        List<EventPoliceCountAssignmentRowDto> rows = new ArrayList<>();
+        eventIds.forEach(id -> {
+            EventPoliceCountAssignmentRowDto row = readAllByEventDesignationCountsAndEventName(id);
+            rows.add(row);
+        });
+        return rows;
     }
 }

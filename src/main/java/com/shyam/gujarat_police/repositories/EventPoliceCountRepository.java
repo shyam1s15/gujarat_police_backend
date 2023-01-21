@@ -12,4 +12,7 @@ public interface EventPoliceCountRepository extends PagingAndSortingRepository<E
 
     @Query("select epc from EventPoliceCount as epc where epc.event.id = :eventId")
     List<EventPoliceCount> getAllByEvent(Long eventId);
+
+    @Query("select epc.event.id from EventPoliceCount as epc group by epc.event.id")
+    List<Long> getAllEventIds();
 }
