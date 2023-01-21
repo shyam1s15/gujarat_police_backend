@@ -120,4 +120,10 @@ public class PoliceService {
     public APIResponse countPolice() {
         return APIResponse.ok(policeRepository.count());
     }
+
+    public APIResponse countPoliceByEvent(Long eventId) {
+        Event event = eventService.readSpecific(eventId);
+        Integer policeObtainedForEvent = event.getPoliceList().size();
+        return APIResponse.ok(policeObtainedForEvent);
+    }
 }

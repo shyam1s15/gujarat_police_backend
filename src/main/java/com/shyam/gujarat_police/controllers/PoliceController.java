@@ -74,8 +74,14 @@ public class PoliceController {
         }
         return APIResponse.ok("Something went wrong");
     }
+
     @GetMapping("/count")
     public APIResponse countPolice() throws JsonProcessingException {
         return policeService.countPolice();
+    }
+
+    @GetMapping("/count-by-event/{event-id}")
+    public APIResponse countPoliceByEvent(@NotNull @PathVariable("event-id") Long eventId) {
+        return policeService.countPoliceByEvent(eventId);
     }
 }
