@@ -4,6 +4,7 @@ package com.shyam.gujarat_police.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.dto.request.CreatePoliceDto;
 import com.shyam.gujarat_police.entities.Designation;
+import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
@@ -29,6 +30,9 @@ public class PoliceService {
     @Autowired
     private PoliceStationService policeStationService;
 
+    @Autowired
+    private EventService eventService;
+
     public List<Police> getAllPolice() {
         return (List<Police>) policeRepository.findAll();
     }
@@ -45,6 +49,7 @@ public class PoliceService {
     }
 
     private Police createPoliceFromDto(CreatePoliceDto dto) {
+        Event event = eventService.readSpecific(dto.getEventId());
         Police police = new Police();
         police.setAge(Integer.parseInt(dto.getAge()));
         police.setBuckleNumber(dto.getBuckleNumber());
@@ -56,6 +61,7 @@ public class PoliceService {
         police.setDesignation(designation);
         PoliceStation policeStation = policeStationService.readSpecificById(dto.getPoliceStation());
         police.setPoliceStation(policeStation);
+        police.setEvent(event);
         return police;
     }
 
@@ -80,6 +86,7 @@ public class PoliceService {
             obtainedPolice.setGender(police.getGender());
             obtainedPolice.setDesignation(police.getDesignation());
             obtainedPolice.setPoliceStation(police.getPoliceStation());
+            obtainedPolice.setEvent(police.getEvent());
             return policeRepository.save(obtainedPolice);
         }
     }

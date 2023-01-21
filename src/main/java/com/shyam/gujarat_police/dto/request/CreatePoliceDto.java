@@ -37,4 +37,7 @@ public class CreatePoliceDto {
 
     @JsonProperty("policeStation")
     private Long policeStation;
+
+    @JsonProperty("event-id")
+    private Long eventId;
 }

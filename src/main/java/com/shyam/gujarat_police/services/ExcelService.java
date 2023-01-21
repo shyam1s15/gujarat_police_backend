@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataInsertionException;
@@ -21,12 +22,16 @@ public class ExcelService {
     private ExcelHelper excelHelper;
 
     @Autowired
+    private EventService eventService;
+
+    @Autowired
     private PoliceStationService policeStationService;
 
 
 
-    public int savePoliceFromExcel(MultipartFile file) throws IOException {
-        List<Police> policeListFromExcel = excelHelper.excelToPolice(file.getInputStream());
+    public int savePoliceFromExcel(MultipartFile file, Long eventId) throws IOException {
+        Event event = eventService.readSpecific(eventId);
+        List<Police> policeListFromExcel = excelHelper.excelToPolice(file.getInputStream(), event);
         return policeService.saveMultiple(policeListFromExcel);
     }
 

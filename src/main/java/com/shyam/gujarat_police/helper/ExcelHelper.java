@@ -1,6 +1,7 @@
 package com.shyam.gujarat_police.helper;
 
 import com.shyam.gujarat_police.entities.Designation;
+import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.ExcelException;
@@ -60,7 +61,7 @@ public class ExcelHelper {
         return TYPE.equals(file.getContentType());
     }
 
-    public List<Police> excelToPolice(InputStream is) {
+    public List<Police> excelToPolice(InputStream is, Event event){
 
         try {
             Workbook workbook = new XSSFWorkbook(is);
@@ -126,6 +127,7 @@ public class ExcelHelper {
                 } catch (Exception e) {
                     throw new ExcelException(e.getMessage() + " : " + e.getCause() + " : " + e.getLocalizedMessage() + " : " + Arrays.toString(e.getStackTrace()));
                 }
+                police.setEvent(event);
                 policeListFromExcel.add(police);
             }
 

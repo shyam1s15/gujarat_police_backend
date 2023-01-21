@@ -63,11 +63,12 @@ public class PoliceController {
     }
 
     @PostMapping("/upload-from-excel")
-    public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile file) throws IOException {
+    public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile file,
+                                       @RequestParam("event-id") Long eventId) throws IOException {
         String message = "";
 
         if (ExcelHelper.hasExcelFormat(file)){
-            int totalPoliceInserted = excelService.savePoliceFromExcel(file);
+            int totalPoliceInserted = excelService.savePoliceFromExcel(file, eventId);
             message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
             return APIResponse.ok(message);
         }
