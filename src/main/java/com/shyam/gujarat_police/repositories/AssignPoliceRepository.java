@@ -24,6 +24,9 @@ public interface AssignPoliceRepository extends PagingAndSortingRepository<Assig
     @Query("select count(asp) from AssignPolice asp where asp.event.id = :eventId and asp.point.id = :pointId")
     Long countPoliceByEventAndPoint(Long eventId, Long pointId);
 
+    @Query("select count(asp) from AssignPolice asp where asp.event.id = :eventId and asp.point.id = :pointId and asp.police.designation.id = :designationId")
+    Integer getPreviousAssignmentForDesignation(Long eventId, Long pointId, Long designationId);
+
 //    @Query("select asp. from AssignPolice asp where asp.event.id In (:eventIds) and ")
 //    List<Long> findAvailablePoliceIds(List<Long> eventIds, List<Long> policeWithDesignationIds);
 

@@ -126,4 +126,13 @@ public class PoliceService {
         Integer policeObtainedForEvent = event.getPoliceList().size();
         return APIResponse.ok(policeObtainedForEvent);
     }
+
+    public List<Police> getUnassignedPoliceOfDesignation(Long eventId, Long designationId) {
+
+        List<Police> unassignedPolice = policeRepository.getUnassignedPoliceOfDesignation(eventId, designationId);
+        if (unassignedPolice.size() == 0) {
+            throw new DataNotFoundException("No free Police found for designation with id " + designationId);
+        }
+        return unassignedPolice;
+    }
 }

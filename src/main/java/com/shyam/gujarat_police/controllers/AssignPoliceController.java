@@ -53,4 +53,11 @@ public class AssignPoliceController {
         List<AssignPolice> respDto = assignPoliceService.saveAssignPoliceByDesignation(dto);
         return APIResponse.ok(respDto);
     }
+
+    @GetMapping("point-assignment")
+    public APIResponse savePointAssignment(@RequestBody AssignPoliceDto dto){
+//        List<Police> resp = assignPoliceService.pointEventLevelAssignment(dto);
+        Object o = assignPoliceService.pointEventLevelAssignment(dto);
+        return APIResponse.ok(o);
+    }
 }

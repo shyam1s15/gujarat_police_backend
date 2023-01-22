@@ -107,7 +107,6 @@ public class EventPoliceCountService {
             dto.setDesignationId(designationId);
             dto.setDesignationCount(count);
             EventPoliceCount eventPoliceCount = saveEventPoliceCountIndividual(dto, Boolean.FALSE);
-            System.out.println(eventPoliceCount.getDesignationId());
             resp.add(eventPoliceCount);
         }
         return (List<EventPoliceCount>) CollectionUtil.makeCollection(eventPoliceCountRespository.saveAll(resp));
@@ -118,11 +117,7 @@ public class EventPoliceCountService {
 
         Event event = eventService.readSpecific(Long.valueOf(body.get("event-id").toString()));
         Map<String, String> designationCounts = (Map<String, String>) body.get("designations");
-        // TODO:event validation check in eventPoliceCount, if exists then data already there please try update methood
-         List<EventPoliceCount> eventPoliceCounts = eventPoliceCountRespository.getAllByEvent(event.getId());
-
-         List<EventPoliceCount> oldEventPoliceCounts = new ArrayList<>();
-        List<EventPoliceCount> newEventPoliceCounts = new ArrayList<>();
+        List<EventPoliceCount> eventPoliceCounts = eventPoliceCountRespository.getAllByEvent(event.getId());
 
         // if designation id exists then update, otherwise add.
         for (Map.Entry<String, String> designationCount : designationCounts.entrySet()){
@@ -136,7 +131,7 @@ public class EventPoliceCountService {
             EventPoliceCount eventPoliceCount = saveEventPoliceCountIndividual(dto, Boolean.FALSE);
             boolean isDesignationPreviouslyExists = false;
             for(EventPoliceCount oldEventPoliceCount : eventPoliceCounts){
-                if (Objects.equals(oldEventPoliceCount.getId(), designationId)){
+                if (Objects.equals(oldEventPoliceCount.getDesignationId(), designationId)){
                     isDesignationPreviouslyExists = true;
                     oldEventPoliceCount.setDesignationCount(count);
                     resp.add(oldEventPoliceCount);

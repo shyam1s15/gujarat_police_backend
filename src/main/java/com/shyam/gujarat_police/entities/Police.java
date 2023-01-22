@@ -56,4 +56,7 @@ public class Police extends BaseModel {
     @JoinColumn(name = "event_id")
     @NotNull(message = "{validation.name.NotEmpty}")
     private Event event;
+
+    @Column(columnDefinition="boolean default 'false'")
+    private boolean isAssigned = false;
 }
