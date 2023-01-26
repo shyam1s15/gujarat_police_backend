@@ -2,6 +2,7 @@ package com.shyam.gujarat_police.services;
 
 import com.shyam.gujarat_police.entities.Zone;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
+import com.shyam.gujarat_police.exceptions.DataSavingException;
 import com.shyam.gujarat_police.repositories.ZoneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ public class ZoneService {
     }
 
     public Zone saveZone(Zone zone) {
+        Optional<Zone> optionalZone = zoneRepository.findByName(zone.getName());
+        if (optionalZone.isPresent()) {
+            throw new DataSavingException("Data already exists for zone " + zone.getName());
+        }
         return zoneRepository.save(zone);
     }
 
