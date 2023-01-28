@@ -29,7 +29,7 @@ public class PointController {
     }
 
     @PutMapping("/{pointId}")
-    public APIResponse updatePoint(@RequestBody @Valid Point point,
+    public APIResponse updatePoint(@RequestBody @Valid PointDto point,
                              @PathVariable("pointId") Long pointId) {
         Point dto = pointService.updatePoint(point, pointId);
         return APIResponse.ok(dto);

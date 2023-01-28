@@ -14,6 +14,9 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PointDto {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("taluka")
     private String taluka= "";
 

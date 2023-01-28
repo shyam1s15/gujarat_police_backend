@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PointService {
@@ -18,8 +19,19 @@ public class PointService {
     @Autowired
     private ZoneService zoneService;
 
-    public List<Point> getPoints() {
-        return (List<Point>) pointRepository.findAll();
+    public List<PointDto> getPoints() {
+        List<Point> points = (List<Point>) pointRepository.findAll();
+        return points.stream().map(point-> {
+            PointDto dto = new PointDto();
+            dto.setId(point.getId());
+            dto.setPointName(point.getPointName());
+            dto.setZone(point.getZone().getId());
+            dto.setDistrict(point.getDistrict());
+            dto.setTaluka(point.getTaluka());
+            dto.setAccessories(point.getAccessories());
+            dto.setRemarks(point.getRemarks());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     public Point savePoint(PointDto dto) {
@@ -34,14 +46,18 @@ public class PointService {
         return pointRepository.save(point);
     }
 
-    public Point updatePoint(Point point, Long pointId) {
+    public Point updatePoint(PointDto point, Long pointId) {
         Point obtainedPoint = pointRepository.findById(pointId)
                 .orElseThrow(()->new DataNotFoundException("Point not found with PointId: " + pointId));
+        Zone zone = zoneService.readSpecifiZone(point.getZone());
 
         obtainedPoint.setTaluka(point.getTaluka());
         obtainedPoint.setDistrict(point.getDistrict());
         obtainedPoint.setPointName(point.getPointName());
-        obtainedPoint.setAssignPolice(point.getAssignPolice());
+//        obtainedPoint.setAssignPolice(obtainedPoint.getAssignPolice());
+        obtainedPoint.setAccessories(point.getAccessories());
+        obtainedPoint.setRemarks(point.getRemarks());
+        obtainedPoint.setZone(zone);
         pointRepository.save(obtainedPoint);
         return obtainedPoint;
     }
