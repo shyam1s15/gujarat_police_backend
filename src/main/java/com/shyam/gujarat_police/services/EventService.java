@@ -25,11 +25,13 @@ public class EventService{
         return events.stream().map(e -> modelMapper.map(e, EventDto.class)).toList();
     }
 
-    public Event saveEvent(Event event) {
-        return eventRepository.save(event);
+    public EventDto saveEvent(EventDto dto) {
+        Event event = modelMapper.map(dto, Event.class);
+        Event savedEvent = eventRepository.save(event);
+        return modelMapper.map(savedEvent, EventDto.class);
     }
 
-    public Event updateEvent(Event event, Long eventId) {
+    public EventDto updateEvent(EventDto dto, Long eventId) {
         if (Objects.isNull(eventId)){
             throw new DataNotFoundException("Event id not found with id " + eventId);
         }
@@ -38,12 +40,14 @@ public class EventService{
             throw new DataNotFoundException("Event not found with id " + eventId);
         } else {
             Event obtainedEvent = optionalEvent.get();
-            obtainedEvent.setEventName(obtainedEvent.getEventName());
-            obtainedEvent.setEventDetails(obtainedEvent.getEventDetails());
-            obtainedEvent.setEventStartDate(obtainedEvent.getEventStartDate());
-            obtainedEvent.setEventEndDate(obtainedEvent.getEventEndDate());
-            obtainedEvent.setAssignPolice(obtainedEvent.getAssignPolice());
-            return eventRepository.save(obtainedEvent);
+            obtainedEvent.setEventName(dto.getEventName());
+            obtainedEvent.setEventDetails(dto.getEventDetails());
+            obtainedEvent.setEventStartDate(dto.getEventStartDate());
+            obtainedEvent.setEventEndDate(dto.getEventEndDate());
+//            obtainedEvent.setAssignPolice(dto.getAssignPolice());
+            Event savedEvent = eventRepository.save(obtainedEvent);
+            return modelMapper.map(savedEvent, EventDto.class);
+
         }
     }
 
