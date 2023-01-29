@@ -5,7 +5,9 @@ import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
 import com.shyam.gujarat_police.dto.request.EventAndPointIdDto;
 import com.shyam.gujarat_police.dto.request.EventIdDto;
 import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
+import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceCountAssignmentRespDto;
+import com.shyam.gujarat_police.dto.response.PoliceInPointAndEventDto;
 import com.shyam.gujarat_police.entities.*;
 import com.shyam.gujarat_police.exceptions.*;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
@@ -369,5 +371,33 @@ public class AssignPoliceService {
         assignPoliceRepository.saveAll(assignPoliceList);
         return policeToBeAssignedList;
 //        return unassignedPoliceOfDesignation;
+    }
+
+    public EventPointPoliceAssignmentRespDto policeByEventAndPoint(EventAndPointIdDto dto) {
+        Point point = pointService.readSpecific(dto.getPointId());
+        Event event = eventService.readSpecific(dto.getEventId());
+
+        EventPointPoliceAssignmentRespDto resp = new EventPointPoliceAssignmentRespDto();
+        resp.setPointId(point.getId());
+        resp.setEventId(event.getId());
+
+        List<AssignPolice> assignments = assignPoliceRepository.assignedPoliceByEventAndPoint(dto.getEventId(), dto.getPointId());
+        List<PoliceInPointAndEventDto> assignedPoliceForce = assignments.stream().map( assignment -> {
+            PoliceInPointAndEventDto police = new PoliceInPointAndEventDto();
+            police.setPoliceId(assignment.getPolice().getId());
+            police.setDutyStartDate(assignment.getDutyStartDate());
+            police.setDutyEndDate(assignment.getDutyEndDate());
+            police.setPoliceName(assignment.getPolice().getFullName());
+            police.setPoliceStationName(assignment.getPolice().getPoliceStation().getPoliceStationName());
+            police.setBuckleNumber(assignment.getPolice().getBuckleNumber());
+            police.setGender(assignment.getPolice().getGender());
+            police.setNumber(assignment.getPolice().getNumber());
+            police.setAge(Integer.toString(assignment.getPolice().getAge()));
+            police.setDistrict(assignment.getPolice().getDistrict());
+            return police;
+        }).toList();
+        resp.setAssignedPoliceList(assignedPoliceForce);
+        resp.setAssignmentCount(assignedPoliceForce.size());
+        return resp;
     }
 }

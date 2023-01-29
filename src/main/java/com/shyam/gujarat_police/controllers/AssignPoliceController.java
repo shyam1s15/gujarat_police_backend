@@ -4,6 +4,7 @@ import com.shyam.gujarat_police.dto.request.AssignPoliceByDesignationCountDto;
 import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
 import com.shyam.gujarat_police.dto.request.EventAndPointIdDto;
 import com.shyam.gujarat_police.dto.request.EventIdDto;
+import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.entities.AssignPolice;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.AssignPoliceService;
@@ -42,10 +43,16 @@ public class AssignPoliceController {
         return APIResponse.ok(respDto);
     }
 
-    @GetMapping("/count-police-in-point-event")
+    @PostMapping("/count-police-in-point-event")
     public APIResponse countPoliceByEventAndPoint(@RequestBody EventAndPointIdDto dto){
         Long respDto = assignPoliceService.countPoliceByEventAndPoint(dto);
         return APIResponse.ok(respDto);
+    }
+
+    @PostMapping("/police-in-point-event")
+    public APIResponse policeByEventAndPoint(@RequestBody EventAndPointIdDto dto){
+        EventPointPoliceAssignmentRespDto resp = assignPoliceService.policeByEventAndPoint(dto);
+        return APIResponse.ok(resp);
     }
 
     @PostMapping("by-designation")
