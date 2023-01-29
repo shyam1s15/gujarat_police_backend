@@ -75,7 +75,7 @@ public class PointPoliceCountController {
         return APIResponse.ok(resp);
     }
 
-    @GetMapping("/designation-counts")
+    @PostMapping("/designation-counts")
     public APIResponse readAllByEventDesignationCountsAndEventName(@RequestBody EventAndPointIdDto dto){
         Long eventId = dto.getEventId();
         Long pointId = dto.getPointId();
