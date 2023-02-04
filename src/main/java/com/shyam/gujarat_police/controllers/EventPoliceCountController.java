@@ -1,6 +1,8 @@
 package com.shyam.gujarat_police.controllers;
 
 import com.shyam.gujarat_police.dto.request.EventPoliceCountDto;
+import com.shyam.gujarat_police.dto.request.PoliceNameIdDto;
+import com.shyam.gujarat_police.dto.response.EventAssignmentByDesignationCountsDto;
 import com.shyam.gujarat_police.dto.response.EventPoliceCountAssignmentRowDto;
 import com.shyam.gujarat_police.entities.EventPoliceCount;
 import com.shyam.gujarat_police.response.APIResponse;
@@ -79,5 +81,17 @@ public class EventPoliceCountController {
     public APIResponse readAllInAssignmentFormat(){
         List<EventPoliceCountAssignmentRowDto> resp = eventPoliceCountService.readAllInAssignmentFormat();
         return APIResponse.ok(resp);
+    }
+
+    @GetMapping("/unassigned_police_list/{eventId}")
+    public APIResponse getUnassignedPoliceInEvent(@PathVariable("eventId") Long eventId){
+        List<PoliceNameIdDto> dto = eventPoliceCountService.getUnassignedPoliceInEvent(eventId);
+        return APIResponse.ok(dto);
+    }
+
+    @GetMapping("/unassigned_police_list_by_designation/{eventId}")
+    public APIResponse getUnassignedPoliceCountInEventByDesignation(@PathVariable("eventId") Long eventId){
+        List<EventAssignmentByDesignationCountsDto> dto = eventPoliceCountService.getPoliceCountInEventByDesignation(eventId);
+        return APIResponse.ok(dto);
     }
 }

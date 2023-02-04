@@ -1,18 +1,28 @@
 package com.shyam.gujarat_police.services;
 
 import com.shyam.gujarat_police.dto.request.EventPoliceCountDto;
+import com.shyam.gujarat_police.dto.request.PoliceNameIdDto;
 import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
+import com.shyam.gujarat_police.dto.response.EventAssignmentByDesignationCountsDto;
 import com.shyam.gujarat_police.dto.response.EventPoliceCountAssignmentRowDto;
+import com.shyam.gujarat_police.entities.Designation;
 import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.EventPoliceCount;
+import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.exceptions.DataSavingException;
 import com.shyam.gujarat_police.repositories.EventPoliceCountRepository;
+import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class EventPoliceCountService {
@@ -25,6 +35,9 @@ public class EventPoliceCountService {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private PoliceRepository policeRepository;
 
     public List<EventPoliceCount> getAllEventPoliceCount() {
         return (List<EventPoliceCount>) eventPoliceCountRespository.findAll();
@@ -187,5 +200,37 @@ public class EventPoliceCountService {
             rows.add(row);
         });
         return rows;
+    }
+
+    public List<PoliceNameIdDto> getUnassignedPoliceInEvent(Long eventId) {
+        List<Police> unassinedPolice = policeRepository.getUnassignedPoliceInEvent(eventId);
+        return unassinedPolice.stream().map(p -> {
+            PoliceNameIdDto policeNameIdDto = new PoliceNameIdDto();
+            policeNameIdDto.setPoliceId(p.getId());
+            policeNameIdDto.setPoliceName(p.getFullName());
+            return policeNameIdDto;
+        }).collect(Collectors.toList());
+//        sout
+    }
+
+    public List<EventAssignmentByDesignationCountsDto> getPoliceCountInEventByDesignation(Long eventId) {
+        List<Designation> allDesignations = designationService.getAllDesignations();
+        return allDesignations.stream().map(designation -> {
+            EventAssignmentByDesignationCountsDto dto = new EventAssignmentByDesignationCountsDto();
+            AtomicInteger assignedPoliceCount = new AtomicInteger();
+            AtomicInteger unAssignedPoliceCount = new AtomicInteger();
+            List<Police> allPoliceInEvent = policeRepository.getPoliceByEventIdAndDesignation(eventId, designation.getId());
+            allPoliceInEvent.forEach(police -> {
+                if (police.isAssigned()) { assignedPoliceCount.getAndIncrement(); } else {
+                    unAssignedPoliceCount.getAndIncrement();
+                }
+            });
+            dto.setDesignationId(designation.getId());
+            dto.setAssignedCount(assignedPoliceCount.get());
+            dto.setUnAssignedCount(unAssignedPoliceCount.get());
+            dto.setName(designation.getName());
+            dto.setNameInGujarati(designation.getNameInGujarati());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }
