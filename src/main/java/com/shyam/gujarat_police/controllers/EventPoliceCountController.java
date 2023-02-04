@@ -89,7 +89,7 @@ public class EventPoliceCountController {
         return APIResponse.ok(dto);
     }
 
-    @GetMapping("/unassigned_police_list_by_designation/{eventId}")
+    @GetMapping("/count_police_in_event_by_designation/{eventId}")
     public APIResponse getUnassignedPoliceCountInEventByDesignation(@PathVariable("eventId") Long eventId){
         List<EventAssignmentByDesignationCountsDto> dto = eventPoliceCountService.getPoliceCountInEventByDesignation(eventId);
         return APIResponse.ok(dto);
