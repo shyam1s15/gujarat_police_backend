@@ -221,9 +221,8 @@ public class EventPoliceCountService {
             AtomicInteger totalPoliceCount = new AtomicInteger();
             List<Police> allPoliceInEvent = policeRepository.getPoliceByEventIdAndDesignation(eventId, designation.getId());
             allPoliceInEvent.forEach(police -> {
-                if (police.isAssigned()) { assignedPoliceCount.getAndIncrement(); } else {
-                    totalPoliceCount.getAndIncrement();
-                }
+                if (police.isAssigned()) { assignedPoliceCount.getAndIncrement(); }
+                totalPoliceCount.getAndIncrement();
             });
             dto.setDesignationId(designation.getId());
             dto.setAssignedCount(assignedPoliceCount.get());
