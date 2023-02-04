@@ -218,16 +218,16 @@ public class EventPoliceCountService {
         return allDesignations.stream().map(designation -> {
             EventAssignmentByDesignationCountsDto dto = new EventAssignmentByDesignationCountsDto();
             AtomicInteger assignedPoliceCount = new AtomicInteger();
-            AtomicInteger unAssignedPoliceCount = new AtomicInteger();
+            AtomicInteger totalPoliceCount = new AtomicInteger();
             List<Police> allPoliceInEvent = policeRepository.getPoliceByEventIdAndDesignation(eventId, designation.getId());
             allPoliceInEvent.forEach(police -> {
                 if (police.isAssigned()) { assignedPoliceCount.getAndIncrement(); } else {
-                    unAssignedPoliceCount.getAndIncrement();
+                    totalPoliceCount.getAndIncrement();
                 }
             });
             dto.setDesignationId(designation.getId());
             dto.setAssignedCount(assignedPoliceCount.get());
-            dto.setUnAssignedCount(unAssignedPoliceCount.get());
+            dto.setTotalPoliceCount(totalPoliceCount.get());
             dto.setName(designation.getName());
             dto.setNameInGujarati(designation.getNameInGujarati());
             return dto;
