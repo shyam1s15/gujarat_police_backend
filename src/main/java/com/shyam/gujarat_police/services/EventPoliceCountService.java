@@ -1,6 +1,8 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.EventIdAndSearchKeyWordDto;
 import com.shyam.gujarat_police.dto.request.EventPoliceCountDto;
+import com.shyam.gujarat_police.dto.request.PoliceIdNameDesigNumDto;
 import com.shyam.gujarat_police.dto.request.PoliceNameIdDto;
 import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
 import com.shyam.gujarat_police.dto.response.EventAssignmentByDesignationCountsDto;
@@ -14,6 +16,7 @@ import com.shyam.gujarat_police.exceptions.DataSavingException;
 import com.shyam.gujarat_police.repositories.EventPoliceCountRepository;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.util.CollectionUtil;
+import com.shyam.gujarat_police.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -213,6 +216,23 @@ public class EventPoliceCountService {
 //        sout
     }
 
+    public List<PoliceIdNameDesigNumDto> getUnassignedPoliceBySearchWithDetailsInEvent(EventIdAndSearchKeyWordDto dto) {
+        List<Police> unassinedPolice = new ArrayList<>();
+        if (TextUtils.notBlankNotEmpty(dto.getSearchPoliceName())){
+            unassinedPolice = policeRepository.getUnassignedPoliceBySearchInEvent(dto.getEventId(), dto.getSearchPoliceName());
+        } else {
+            unassinedPolice = policeRepository.getUnassignedPoliceInEvent(dto.getEventId());
+        }
+        return unassinedPolice.stream().map(p -> {
+            PoliceIdNameDesigNumDto resp = new PoliceIdNameDesigNumDto();
+            resp.setPoliceId(p.getId());
+            resp.setPoliceName(p.getFullName());
+            resp.setPoliceDesignation(p.getDesignation().getName());
+            resp.setPoliceDistrict(p.getDistrict());
+            resp.setPoliceNumber(p.getNumber());
+            return resp;
+        }).collect(Collectors.toList());
+    }
     public List<EventAssignmentByDesignationCountsDto> getPoliceCountInEventByDesignation(Long eventId) {
         List<Designation> allDesignations = designationService.getAllDesignations();
         return allDesignations.stream().map(designation -> {
@@ -232,4 +252,5 @@ public class EventPoliceCountService {
             return dto;
         }).collect(Collectors.toList());
     }
+
 }

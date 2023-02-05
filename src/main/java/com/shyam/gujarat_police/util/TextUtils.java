@@ -31,7 +31,7 @@ public final class TextUtils {
         return true;
     }
 
-    public static boolean notBankNotEmpty(String s) {
+    public static boolean notBlankNotEmpty(String s) {
         if (s == null) {
             return false;
         }

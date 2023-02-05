@@ -43,10 +43,10 @@ public class DesignationService {
             throw new DataNotFoundException("Designation not found: " + designationId);
         } else {
             Designation obtainedDesignation = designationOptional.get();
-            if (TextUtils.notBankNotEmpty(designation.getName())) {
+            if (TextUtils.notBlankNotEmpty(designation.getName())) {
                 obtainedDesignation.setName(designation.getName());
             }
-            if (TextUtils.notBankNotEmpty(designation.getNameInGujarati())) {
+            if (TextUtils.notBlankNotEmpty(designation.getNameInGujarati())) {
                 obtainedDesignation.setNameInGujarati(designation.getNameInGujarati());
             }
             return designationRepository.save(obtainedDesignation);

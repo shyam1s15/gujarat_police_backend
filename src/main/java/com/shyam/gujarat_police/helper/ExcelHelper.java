@@ -208,10 +208,10 @@ public class ExcelHelper {
                 policeStation.setTaluko("-");
                 policeStation.setTalukoInGuj("-");
                 policeStation.setContactNumber("");
-                if (TextUtils.notBankNotEmpty(policeStation.getPoliceStationName()) &&
-                        TextUtils.notBankNotEmpty(policeStation.getPoliceStationNameInGujarati()) &&
-                        TextUtils.notBankNotEmpty(policeStation.getDistrict()) &&
-                        TextUtils.notBankNotEmpty(policeStation.getDistrictInGuj())) {
+                if (TextUtils.notBlankNotEmpty(policeStation.getPoliceStationName()) &&
+                        TextUtils.notBlankNotEmpty(policeStation.getPoliceStationNameInGujarati()) &&
+                        TextUtils.notBlankNotEmpty(policeStation.getDistrict()) &&
+                        TextUtils.notBlankNotEmpty(policeStation.getDistrictInGuj())) {
                     policeStationListFromExcel.add(policeStation);
                 }
             }

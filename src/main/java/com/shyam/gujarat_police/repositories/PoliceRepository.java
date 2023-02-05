@@ -20,4 +20,7 @@ public interface PoliceRepository extends PagingAndSortingRepository<Police, Lon
 
     @Query("select p from Police p where p.event.id = :eventId and p.designation.id = :designationId")
     List<Police> getPoliceByEventIdAndDesignation(Long eventId, Long designationId);
+
+    @Query("SELECT p FROM Police p where p.event.id = :eventId and p.isAssigned = false and p.fullName LIKE CONCAT('%',:searchPoliceName,'%')")
+    List<Police> getUnassignedPoliceBySearchInEvent(Long eventId, String searchPoliceName);
 }
