@@ -135,4 +135,8 @@ public class PoliceService {
         }
         return unassignedPolice;
     }
+
+    public List<Police> getPoliceByIds(List<Long> policeIds) {
+        return (List<Police>) policeRepository.findAllById(policeIds);
+    }
 }

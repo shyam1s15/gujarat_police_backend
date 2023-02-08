@@ -1,9 +1,6 @@
 package com.shyam.gujarat_police.services;
 
-import com.shyam.gujarat_police.dto.request.AssignPoliceByDesignationCountDto;
-import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
-import com.shyam.gujarat_police.dto.request.EventAndPointIdDto;
-import com.shyam.gujarat_police.dto.request.EventIdDto;
+import com.shyam.gujarat_police.dto.request.*;
 import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceCountAssignmentRespDto;
@@ -12,12 +9,14 @@ import com.shyam.gujarat_police.entities.*;
 import com.shyam.gujarat_police.exceptions.*;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
+import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class AssignPoliceService {
@@ -400,4 +399,48 @@ public class AssignPoliceService {
         resp.setAssignmentCount(assignedPoliceForce.size());
         return resp;
     }
+
+    public APIResponse assignMultiplePolice(AssignMultiplePoliceDto dto) {
+        // check if already these police ids are not assigned
+        List<Event> eventsBetweenGivenEvent = eventService.getEventsBetweenGivenEvent(dto.getEventId());
+        List<Police> policeList = policeService.getPoliceByIds(dto.getPoliceIds());
+
+        for(Police p : policeList){
+            if (p.isAssigned()){
+                return APIResponse.error("Police is already assigned please remove " + p.getFullName());
+            }
+        }
+        Point point = pointService.readSpecific(dto.getPointId());
+        Event event = eventService.readSpecific(dto.getEventId());
+        if (!policeList.isEmpty() && Objects.nonNull(point)
+                && Objects.nonNull(event)){
+            List<AssignPolice> assignPoliceList = new ArrayList<>();
+            policeList.stream().forEach( police -> {
+                AssignPolice assignPolice = new AssignPolice();
+                assignPolice.setAssignedDate(dto.getAssignedDate());
+                Calendar cal = Calendar.getInstance(); // creates calendar
+                cal.setTime(dto.getDutyStartDate());               // sets calendar time/date
+                cal.add(Calendar.HOUR_OF_DAY, 6);      // adds six hour
+                assignPolice.setDutyStartDate(dto.getDutyStartDate());
+                assignPolice.setDutyEndDate(dto.getDutyEndDate());
+
+                // check if duty dates is in range of event date.
+                if (!(event.getEventStartDate().before(assignPolice.getDutyStartDate()) && event.getEventEndDate().after(assignPolice.getDutyEndDate()))) {
+                    throw new DateMisMatchException("Date is not in range of event date : " + event.getEventStartDate() + " : " + event.getEventEndDate() + " police assignment dates : " + assignPolice.getDutyStartDate() + " " + assignPolice.getDutyEndDate());
+                }
+
+                assignPolice.setPolice(police);
+                assignPolice.setPoint(point);
+                assignPolice.setEvent(event);
+                assignPoliceList.add(assignPolice);
+            });
+            assignPoliceRepository.saveAll(assignPoliceList);
+            policeRepository.updatePoliceAssignStatusAssigned(policeList.stream().map(Police::getId).collect(Collectors.toList()));
+            return APIResponse.ok("Total of " + assignPoliceList.size() + " police were assigned in event " + event.getEventName());
+        } else {
+            throw new DataSavingException("Could not save assigned police information");
+        }
+    }
+
+//    public E
 }

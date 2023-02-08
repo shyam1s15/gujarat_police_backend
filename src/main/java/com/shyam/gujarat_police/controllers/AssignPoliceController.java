@@ -1,9 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
-import com.shyam.gujarat_police.dto.request.AssignPoliceByDesignationCountDto;
-import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
-import com.shyam.gujarat_police.dto.request.EventAndPointIdDto;
-import com.shyam.gujarat_police.dto.request.EventIdDto;
+import com.shyam.gujarat_police.dto.request.*;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.entities.AssignPolice;
 import com.shyam.gujarat_police.response.APIResponse;
@@ -35,6 +32,18 @@ public class AssignPoliceController {
     public APIResponse saveAssignPoliceV2(@RequestBody AssignPoliceDto assignPolice){
         AssignPolice dto = assignPoliceService.saveAssignPoliceV2(assignPolice);
         return APIResponse.ok(dto);
+    }
+
+//    @PostMapping("/assign_police")
+//    public APIResponse assignMultiplePolice(@RequestBody AssignMultiplePoliceDto dto){
+//        APIResponse resp = assignPoliceService.assignMultiplePolice(dto);
+//        return APIResponse.ok(resp);
+//    }
+
+    @PostMapping("/assign_multiple")
+    public APIResponse saveAssignPoliceByPoliceIdList(@RequestBody AssignMultiplePoliceDto dto){
+        return assignPoliceService.assignMultiplePolice(dto);
+
     }
 
     @GetMapping("/count-police-in-event")
