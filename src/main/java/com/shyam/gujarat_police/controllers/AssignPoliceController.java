@@ -2,6 +2,7 @@ package com.shyam.gujarat_police.controllers;
 
 import com.shyam.gujarat_police.dto.request.*;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
+import com.shyam.gujarat_police.dto.response.EventPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.entities.AssignPolice;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.AssignPoliceService;
@@ -61,6 +62,12 @@ public class AssignPoliceController {
     @PostMapping("/police-in-point-event")
     public APIResponse policeByEventAndPoint(@RequestBody EventAndPointIdDto dto){
         EventPointPoliceAssignmentRespDto resp = assignPoliceService.policeByEventAndPoint(dto);
+        return APIResponse.ok(resp);
+    }
+
+    @PostMapping("/police-in-event")
+    public APIResponse policeByEvent(@RequestBody EventAndPointIdDto dto){
+        EventPoliceAssignmentRespDto resp = assignPoliceService.policeByEvent(dto);
         return APIResponse.ok(resp);
     }
 

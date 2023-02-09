@@ -1,10 +1,7 @@
 package com.shyam.gujarat_police.services;
 
 import com.shyam.gujarat_police.dto.request.*;
-import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
-import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
-import com.shyam.gujarat_police.dto.response.EventPointPoliceCountAssignmentRespDto;
-import com.shyam.gujarat_police.dto.response.PoliceInPointAndEventDto;
+import com.shyam.gujarat_police.dto.response.*;
 import com.shyam.gujarat_police.entities.*;
 import com.shyam.gujarat_police.exceptions.*;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
@@ -440,6 +437,41 @@ public class AssignPoliceService {
         } else {
             throw new DataSavingException("Could not save assigned police information");
         }
+    }
+
+    public EventPoliceAssignmentRespDto policeByEvent(EventAndPointIdDto dto) {
+        Event event = eventService.readSpecific(dto.getEventId());
+        EventPoliceAssignmentRespDto resp = new EventPoliceAssignmentRespDto();
+        resp.setEventId(event.getId());
+        List<PointPoliceAssignmentRespDto> pointAssignmentList = new ArrayList<>();
+        List<Long> pointIds = pointService.getPoints().stream().map(PointDto::getId).toList();
+        pointIds.stream().forEach(pointId -> {
+            PointPoliceAssignmentRespDto pointAssignment = new PointPoliceAssignmentRespDto();
+            List<AssignPolice> assignments = assignPoliceRepository.assignedPoliceByEventAndPoint(dto.getEventId(), pointId);
+            System.out.println(assignments.size());
+            if (assignments.size() > 0){
+                List<PoliceInPointAndEventDto> assignedPoliceForce = assignments.stream().map( assignment -> {
+                    PoliceInPointAndEventDto police = new PoliceInPointAndEventDto();
+                    police.setPoliceId(assignment.getPolice().getId());
+                    police.setDutyStartDate(assignment.getDutyStartDate());
+                    police.setDutyEndDate(assignment.getDutyEndDate());
+                    police.setPoliceName(assignment.getPolice().getFullName());
+                    police.setPoliceStationName(assignment.getPolice().getPoliceStation().getPoliceStationName());
+                    police.setBuckleNumber(assignment.getPolice().getBuckleNumber());
+                    police.setGender(assignment.getPolice().getGender());
+                    police.setNumber(assignment.getPolice().getNumber());
+                    police.setAge(Integer.toString(assignment.getPolice().getAge()));
+                    police.setDistrict(assignment.getPolice().getDistrict());
+                    return police;
+                }).toList();
+                pointAssignment.setAssignedPoliceList(assignedPoliceForce);
+                pointAssignment.setPointId(pointId);
+                pointAssignment.setAssignmentCount(assignments.size());
+                pointAssignmentList.add(pointAssignment);
+            }
+        });
+        resp.setPointAssignments(pointAssignmentList);
+        return resp;
     }
 
 //    public E
