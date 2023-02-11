@@ -18,6 +18,12 @@ public class PointPoliceAssignmentRespDto {
     @JsonProperty("point-id")
     private Long pointId;
 
+    @JsonProperty("point-name")
+    private String pointName;
+
+    @JsonProperty("zone-name")
+    private String zoneName;
+
     @JsonProperty("assignment-count")
     private Integer assignmentCount;
 

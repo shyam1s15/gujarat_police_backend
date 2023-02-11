@@ -444,10 +444,13 @@ public class AssignPoliceService {
         EventPoliceAssignmentRespDto resp = new EventPoliceAssignmentRespDto();
         resp.setEventId(event.getId());
         List<PointPoliceAssignmentRespDto> pointAssignmentList = new ArrayList<>();
-        List<Long> pointIds = pointService.getPoints().stream().map(PointDto::getId).toList();
-        pointIds.stream().forEach(pointId -> {
+        List<PointDto> allPoints = pointService.getPoints();
+//        List<Long> pointIds = allPoints.stream().map(PointDto::getId).toList();
+
+
+        allPoints.stream().forEach(point -> {
             PointPoliceAssignmentRespDto pointAssignment = new PointPoliceAssignmentRespDto();
-            List<AssignPolice> assignments = assignPoliceRepository.assignedPoliceByEventAndPoint(dto.getEventId(), pointId);
+            List<AssignPolice> assignments = assignPoliceRepository.assignedPoliceByEventAndPoint(dto.getEventId(), point.getId());
             System.out.println(assignments.size());
             if (assignments.size() > 0){
                 List<PoliceInPointAndEventDto> assignedPoliceForce = assignments.stream().map( assignment -> {
@@ -465,7 +468,9 @@ public class AssignPoliceService {
                     return police;
                 }).toList();
                 pointAssignment.setAssignedPoliceList(assignedPoliceForce);
-                pointAssignment.setPointId(pointId);
+                pointAssignment.setPointId(point.getId());
+                pointAssignment.setPointName(point.getPointName());
+                pointAssignment.setZoneName(point.getZoneName());
                 pointAssignment.setAssignmentCount(assignments.size());
                 pointAssignmentList.add(pointAssignment);
             }

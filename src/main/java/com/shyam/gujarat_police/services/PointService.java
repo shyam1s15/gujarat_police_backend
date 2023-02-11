@@ -26,6 +26,7 @@ public class PointService {
             dto.setId(point.getId());
             dto.setPointName(point.getPointName());
             dto.setZone(point.getZone().getId());
+            dto.setZoneName(point.getZone().getName());
             dto.setDistrict(point.getDistrict());
             dto.setTaluka(point.getTaluka());
             dto.setAccessories(point.getAccessories());
@@ -69,4 +70,5 @@ public class PointService {
     public void deletePoint(Long pointId) {
         pointRepository.deleteById(pointId);
     }
+
 }

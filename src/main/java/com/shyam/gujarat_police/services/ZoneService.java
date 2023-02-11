@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 public class ZoneService {
     @Autowired
-    ZoneRepository zoneRepository;
+    private ZoneRepository zoneRepository;
 
     public List<Zone> getAllZones() {
         return zoneRepository.findAll();

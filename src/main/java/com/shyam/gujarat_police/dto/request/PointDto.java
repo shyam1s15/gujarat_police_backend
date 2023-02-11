@@ -34,4 +34,7 @@ public class PointDto {
 
     @JsonProperty("zone")
     private Long zone;
+
+    @JsonProperty("zone-name")
+    private String zoneName;
 }
