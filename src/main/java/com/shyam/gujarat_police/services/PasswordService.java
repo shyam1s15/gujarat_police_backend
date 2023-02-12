@@ -1,0 +1,100 @@
+package com.shyam.gujarat_police.services;
+
+import com.shyam.gujarat_police.dto.request.PasswordHistoryDto;
+import com.shyam.gujarat_police.entities.Event;
+import com.shyam.gujarat_police.entities.PasswordHistory;
+import com.shyam.gujarat_police.entities.Passwords;
+import com.shyam.gujarat_police.exceptions.CustomException;
+import com.shyam.gujarat_police.exceptions.DataNotFoundException;
+import com.shyam.gujarat_police.repositories.PasswordHistoryRepository;
+import com.shyam.gujarat_police.repositories.PasswordRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.security.SecureRandom;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+
+@Service
+public class PasswordService {
+    @Autowired
+    private PasswordRepository passwordRepository;
+
+    @Autowired
+    private PasswordHistoryRepository passwordHistoryRepository;
+
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public String generatePasswordForEvent(Long eventId){
+        Event event = eventService.readSpecific(eventId);
+
+        String password = generatePassword();
+        String hashedPassword = passwordEncoder.encode(password);
+        Passwords newPasswordForEvent = new Passwords();
+        newPasswordForEvent.setHashedPassword(hashedPassword);
+        newPasswordForEvent.setEventId(eventId);
+        newPasswordForEvent.setCreatedAt(new Date());
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = calendar.getTime();
+        calendar.add(Calendar.HOUR, 1);
+        newPasswordForEvent.setValidityUpto(calendar.getTime());
+        newPasswordForEvent.setExpired(false);
+
+        passwordRepository.expireAllPasswordForEvent(eventId);
+        passwordRepository.save(newPasswordForEvent);
+
+        return password;
+    }
+
+    public boolean verifyPassword(String password, Long eventId, PasswordHistoryDto dto){
+        Event event = eventService.readSpecific(eventId);
+        Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC);
+        List<Passwords> passwords = passwordRepository.findMostRecentPassword(eventId, pageable).getContent();
+        if (CollectionUtils.isEmpty(passwords)) {
+            throw new DataNotFoundException("No new passwords found or passwords are expired, please contact admin");
+        }
+        Passwords lastPassword = passwords.get(0);
+        Date now = new Date();
+        if ((now.getTime() - lastPassword.getValidityUpto().getTime()) > 60*1000*1000){
+            throw new CustomException("Password expired, please contact administrator");
+        }
+
+        // if password is valid expire currentPassword & create a password history
+        if (passwordEncoder.matches(password, lastPassword.getHashedPassword())){
+            lastPassword.setExpired(true);
+            passwordRepository.save(lastPassword);
+            PasswordHistory passwordHistory = new PasswordHistory();
+            passwordHistory.setIp(dto.getIp());
+            passwordHistory.setAccessType(dto.getAccessType());
+            passwordHistory.setUsername(dto.getUsername());
+            passwordHistory.setPhoneNumber(dto.getPhoneNumber());
+            passwordHistory.setDeviceType(dto.getDeviceType());
+            passwordHistoryRepository.save(passwordHistory);
+            return true;
+        } else {
+            throw new CustomException("Password mismatch");
+        }
+    }
+
+    private static String generatePassword() {
+        final SecureRandom secureRandom = new SecureRandom();
+        final int length = 8;
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(secureRandom.nextInt(10));
+        }
+        return sb.toString();
+    }
+
+//    public List<PasswordsRespDto> List
+}

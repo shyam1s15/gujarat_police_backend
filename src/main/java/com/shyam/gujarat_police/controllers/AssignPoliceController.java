@@ -84,4 +84,6 @@ public class AssignPoliceController {
         Object o = assignPoliceService.pointEventLevelAssignment(dto);
         return APIResponse.ok(o);
     }
+
+
 }
