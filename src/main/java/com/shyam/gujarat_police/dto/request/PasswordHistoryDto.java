@@ -38,4 +38,7 @@ public class PasswordHistoryDto {
 
     @JsonProperty("access-type")
     private Integer accessType; // manual 1, upload excel 2, both 2
+
+    @JsonProperty("password")
+    private String password;
 }

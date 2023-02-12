@@ -1,6 +1,7 @@
 package com.shyam.gujarat_police.services;
 
 import com.shyam.gujarat_police.dto.request.PasswordHistoryDto;
+import com.shyam.gujarat_police.dto.response.PasswordsHistoryRespDto;
 import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.PasswordHistory;
 import com.shyam.gujarat_police.entities.Passwords;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -96,5 +98,23 @@ public class PasswordService {
         return sb.toString();
     }
 
-//    public List<PasswordsRespDto> List
+    public List<PasswordsHistoryRespDto> obtainPasswordHistory(){
+        List<PasswordHistory> passwordHistories = passwordHistoryRepository.findAll();
+        List<PasswordsHistoryRespDto> resp = new ArrayList<>();
+        Event event = null;
+        for(PasswordHistory ph : passwordHistories){
+            PasswordsHistoryRespDto dto = new PasswordsHistoryRespDto();
+            dto.setIp(ph.getIp());
+            dto.setDeviceType(ph.getDeviceType());
+            String accessType = ph.getAccessType() == 1 ? "Manual Insert" : ph.getAccessType() == 2 ? "Excel Insert" : "Both Manual & Excel Inserts";
+            dto.setAccessType(accessType);
+            dto.setPhoneNumber(ph.getPhoneNumber());
+            dto.setUsedAt(ph.getUsedAt());
+            event = eventService.readSpecific(ph.getEventId());
+            dto.setEventName(event.getEventName());
+            dto.setUserName(ph.getUsername());
+            resp.add(dto);
+        }
+        return resp;
+    }
 }

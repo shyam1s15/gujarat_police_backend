@@ -15,19 +15,26 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PasswordsRespDto {
+public class PasswordsHistoryRespDto {
 
     @JsonProperty("event-name")
     private String eventName;
 
-    @JsonProperty("created-at")
-    private Date createdAt;
+    @JsonProperty("used-at")
+    private Date usedAt;
 
-    @JsonProperty("valid-upto")
-    private String validUpto;
+    @JsonProperty("user-name")
+    private String userName;
 
-    @JsonProperty("is-expired")
-    private boolean isExpired;
+    @JsonProperty("ip")
+    private String ip;
 
+    @JsonProperty("phone-number")
+    private String phoneNumber;
 
+    @JsonProperty("device-type")
+    private String deviceType;
+
+    @JsonProperty("access-type")
+    private String accessType;
 }

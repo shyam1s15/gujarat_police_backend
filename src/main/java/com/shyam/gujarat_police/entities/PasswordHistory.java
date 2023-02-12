@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -32,5 +33,8 @@ public class PasswordHistory {
 
     private Long eventId;
 
-    private Integer accessType; // manual 1, upload excel 2, both 2
+    private Integer accessType;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date usedAt;// manual 1, upload excel 2, both 2
 }
