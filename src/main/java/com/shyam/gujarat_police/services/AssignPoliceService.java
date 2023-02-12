@@ -66,6 +66,7 @@ public class AssignPoliceService {
             assignPolice.setPoint(point);
             assignPolice.setEvent(event);
             if (!isPoliceAssigned(assignPolice)){
+                policeRepository.updatePoliceAssignStatusAssigned(List.of(police.getId()));
                 return assignPoliceRepository.save(assignPolice);
             } else {
                  throw new PoliceAlreadyAssignedException("Police already assigned");
@@ -291,7 +292,7 @@ public class AssignPoliceService {
         }
         Collections.shuffle(availablePoliceIdsWithDesignation);
         List<AssignPolice> assignedPoliceList = new ArrayList<AssignPolice>();
-
+        List<Long> assignedPoliceIds = new ArrayList<>();
         for(int i = 0; i < dto.getPoliceCount(); i++){
             AssignPolice assignPolice = new AssignPolice();
             assignPolice.setEvent(event);
@@ -300,9 +301,11 @@ public class AssignPoliceService {
             assignPolice.setDutyEndDate(dutyEndDate);
             assignPolice.setAssignedDate(assignedDate);
             assignPolice.setPolice(availablePoliceIdsWithDesignation.get(i));
+            assignedPoliceIds.add(availablePoliceIdsWithDesignation.get(i).getId());
             assignedPoliceList.add(assignPolice);
         }
         assignPoliceRepository.saveAll(assignedPoliceList);
+        policeRepository.updatePoliceAssignStatusAssigned(assignedPoliceIds);
         return assignedPoliceList;
     }
 
@@ -403,6 +406,7 @@ public class AssignPoliceService {
         List<Police> policeList = policeService.getPoliceByIds(dto.getPoliceIds());
 
         for(Police p : policeList){
+            System.out.println(p.getId() + " " + p.getFullName() + " " + p.isAssigned());
             if (p.isAssigned()){
                 return APIResponse.error("Police is already assigned please remove " + p.getFullName());
             }

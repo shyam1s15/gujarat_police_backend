@@ -26,8 +26,9 @@ public class AssignPoliceController {
 
     @PostMapping("/")
     public APIResponse saveAssignPolice(@RequestBody AssignPoliceDto assignPolice){
-        AssignPolice dto = assignPoliceService.saveAssignPolice(assignPolice);
-        return APIResponse.ok(dto);
+        return APIResponse.error("depreciated");
+//        AssignPolice dto = assignPoliceService.saveAssignPolice(assignPolice);
+//        return APIResponse.ok(dto);
     }
     @PostMapping("/V2")
     public APIResponse saveAssignPoliceV2(@RequestBody AssignPoliceDto assignPolice){
