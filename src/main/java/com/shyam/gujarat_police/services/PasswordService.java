@@ -12,7 +12,6 @@ import com.shyam.gujarat_police.repositories.PasswordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -60,7 +59,7 @@ public class PasswordService {
 
     public boolean verifyPassword(String password, Long eventId, PasswordHistoryDto dto){
         Event event = eventService.readSpecific(eventId);
-        Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC);
+        Pageable pageable = PageRequest.of(0, 1);
         List<Passwords> passwords = passwordRepository.findMostRecentPassword(eventId, pageable).getContent();
         if (CollectionUtils.isEmpty(passwords)) {
             throw new DataNotFoundException("No new passwords found or passwords are expired, please contact admin");
@@ -77,10 +76,12 @@ public class PasswordService {
             passwordRepository.save(lastPassword);
             PasswordHistory passwordHistory = new PasswordHistory();
             passwordHistory.setIp(dto.getIp());
-            passwordHistory.setAccessType(dto.getAccessType());
+            Integer accessType = dto.getAccessType() == null ? 0 : dto.getAccessType();
+            passwordHistory.setAccessType(accessType);
             passwordHistory.setUsername(dto.getUsername());
             passwordHistory.setPhoneNumber(dto.getPhoneNumber());
             passwordHistory.setDeviceType(dto.getDeviceType());
+            passwordHistory.setEventId(eventId);
             passwordHistoryRepository.save(passwordHistory);
             return true;
         } else {
@@ -100,13 +101,20 @@ public class PasswordService {
 
     public List<PasswordsHistoryRespDto> obtainPasswordHistory(){
         List<PasswordHistory> passwordHistories = passwordHistoryRepository.findAll();
+        if (CollectionUtils.isEmpty(passwordHistories)){
+            throw new DataNotFoundException("No password history");
+        }
         List<PasswordsHistoryRespDto> resp = new ArrayList<>();
         Event event = null;
         for(PasswordHistory ph : passwordHistories){
             PasswordsHistoryRespDto dto = new PasswordsHistoryRespDto();
             dto.setIp(ph.getIp());
             dto.setDeviceType(ph.getDeviceType());
-            String accessType = ph.getAccessType() == 1 ? "Manual Insert" : ph.getAccessType() == 2 ? "Excel Insert" : "Both Manual & Excel Inserts";
+
+            String accessType = ph.getAccessType() != null ? ph.getAccessType() == 1
+                    ? "Manual Insert" : ph.getAccessType() == 2
+                    ? "Excel Insert" : "Both Manual & Excel Inserts"
+                    : "Not Accessed normally";
             dto.setAccessType(accessType);
             dto.setPhoneNumber(ph.getPhoneNumber());
             dto.setUsedAt(ph.getUsedAt());
