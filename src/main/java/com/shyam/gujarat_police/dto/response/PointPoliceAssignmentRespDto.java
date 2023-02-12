@@ -21,6 +21,12 @@ public class PointPoliceAssignmentRespDto {
     @JsonProperty("point-name")
     private String pointName;
 
+    @JsonProperty("point-accessories")
+    private String pointAccessories;
+
+    @JsonProperty("point-remarks")
+    private String pointRemarks;
+
     @JsonProperty("zone-name")
     private String zoneName;
 

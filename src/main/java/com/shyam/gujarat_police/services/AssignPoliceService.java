@@ -470,6 +470,8 @@ public class AssignPoliceService {
                 pointAssignment.setAssignedPoliceList(assignedPoliceForce);
                 pointAssignment.setPointId(point.getId());
                 pointAssignment.setPointName(point.getPointName());
+                pointAssignment.setPointAccessories(point.getAccessories());
+                pointAssignment.setPointRemarks(point.getRemarks());
                 pointAssignment.setZoneName(point.getZoneName());
                 pointAssignment.setAssignmentCount(assignments.size());
                 pointAssignmentList.add(pointAssignment);
