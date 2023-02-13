@@ -1,6 +1,7 @@
 package com.shyam.gujarat_police.services;
 
 import com.shyam.gujarat_police.dto.request.PasswordHistoryDto;
+import com.shyam.gujarat_police.dto.response.PasswordHistoriesList;
 import com.shyam.gujarat_police.dto.response.PasswordsHistoryRespDto;
 import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.PasswordHistory;
@@ -99,7 +100,7 @@ public class PasswordService {
         return sb.toString();
     }
 
-    public List<PasswordsHistoryRespDto> obtainPasswordHistory(){
+    public PasswordHistoriesList obtainPasswordHistory(){
         List<PasswordHistory> passwordHistories = passwordHistoryRepository.findAll();
         if (CollectionUtils.isEmpty(passwordHistories)){
             throw new DataNotFoundException("No password history");
@@ -123,6 +124,8 @@ public class PasswordService {
             dto.setUserName(ph.getUsername());
             resp.add(dto);
         }
-        return resp;
+        PasswordHistoriesList passwordHistoriesList = new PasswordHistoriesList();
+        passwordHistoriesList.setPasswordsHistoryRespDtoList(resp);
+        return passwordHistoriesList;
     }
 }
