@@ -15,4 +15,7 @@ public interface PointPoliceCountRepository extends PagingAndSortingRepository<P
 
     @Query("select ppc from PointPoliceCount as ppc where ppc.eventId = :eventId and ppc.pointId = :pointId")
     List<PointPoliceCount> getAllByEventAndPointId(Long eventId, Long pointId);
+
+
+    List<PointPoliceCount> findByEventId(Long eventId);
 }

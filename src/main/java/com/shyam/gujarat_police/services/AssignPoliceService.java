@@ -499,8 +499,11 @@ public class AssignPoliceService {
     *   police should be automatically assigned <= pointPoliceCount
     * */
     public APIResponse assignAutomaticallyAllPoints(Long eventId) {
-        return null;
+        Event event = eventService.readSpecific(eventId);
+        List<PointDto> allPoints = pointService.getPoints();
+        List<PointPoliceCount> pointPoliceCounts = pointPoliceCountService.getAllPointPoliceCount();
 
+        return null;
     }
 
 //    public E
