@@ -84,4 +84,5 @@ public class PoliceController {
     public APIResponse countPoliceByEvent(@NotNull @PathVariable("event-id") Long eventId) {
         return policeService.countPoliceByEvent(eventId);
     }
+
 }
