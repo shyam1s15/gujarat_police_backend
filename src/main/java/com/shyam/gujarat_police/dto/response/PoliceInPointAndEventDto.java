@@ -46,4 +46,7 @@ public class PoliceInPointAndEventDto {
 
     @JsonProperty("district")
     private String district;
+
+    @JsonProperty("designation")
+    private String designation;
 }

@@ -477,6 +477,7 @@ public class AssignPoliceService {
                     police.setNumber(assignment.getPolice().getNumber());
                     police.setAge(Integer.toString(assignment.getPolice().getAge()));
                     police.setDistrict(assignment.getPolice().getDistrict());
+                    police.setDesignation(assignment.getPolice().getDesignation().getName());
                     return police;
                 }).toList();
                 pointAssignment.setAssignedPoliceList(assignedPoliceForce);
@@ -493,9 +494,13 @@ public class AssignPoliceService {
         return resp;
     }
 
-
+    /*
+    *   assign police in best of designations given from total police by designation
+    *   police should be automatically assigned <= pointPoliceCount
+    * */
     public APIResponse assignAutomaticallyAllPoints(Long eventId) {
         return null;
+
     }
 
 //    public E
