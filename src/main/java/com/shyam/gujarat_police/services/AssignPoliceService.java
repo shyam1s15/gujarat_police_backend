@@ -493,6 +493,7 @@ public class AssignPoliceService {
         return resp;
     }
 
+
     public APIResponse assignAutomaticallyAllPoints(Long eventId) {
         return null;
     }
