@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class AssignPolice {
+public class AssignPolice extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,8 +33,15 @@ public class AssignPolice {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date assignedDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private Date dutyStartDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private Date dutyEndDate;
+
     @ManyToOne
 //    @JsonIgnore
     @JoinColumn(name = "event_id")
     private Event event;
+
 }

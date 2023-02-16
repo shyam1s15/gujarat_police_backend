@@ -32,7 +32,7 @@ public class PoliceStationDto {
     @JsonProperty("police-station-name-in-english")
     private String policeStationName;
 
-    @JsonProperty("police-station-name-in-english")
+    @JsonProperty("police-station-name-in-gujarati")
     private String policeStationNameInGujarati;
 
     @JsonProperty("headPolice")

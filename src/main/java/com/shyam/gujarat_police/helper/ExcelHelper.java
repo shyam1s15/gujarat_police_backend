@@ -1,11 +1,15 @@
 package com.shyam.gujarat_police.helper;
 
 import com.shyam.gujarat_police.entities.Designation;
+import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.ExcelException;
 import com.shyam.gujarat_police.services.DesignationService;
 import com.shyam.gujarat_police.services.PoliceStationService;
+import com.shyam.gujarat_police.util.ObjectUtil;
+import com.shyam.gujarat_police.util.RegExUtil;
+import com.shyam.gujarat_police.util.TextUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +28,7 @@ import java.util.logging.Logger;
 public class ExcelHelper {
     static Logger logger = Logger.getLogger(ExcelHelper.class.getName());
 
-    public static class PoliceIndex{
+    public static class PoliceIndex {
         public static final int POLICE_DESIGNATION = 1;
         public static final int POLICE_FULLNAME = 2;
         public static final int POLICE_BUCKLE_NUMBER = 3;
@@ -35,18 +39,16 @@ public class ExcelHelper {
         public static final int POLICE_AGE = 8;
     }
 
-    public static class PoliceStationIndex{
-        public static final int POLICESTATION_DISTRICT = 1;
-        public static final int POLICESTATION_DISTRICT_IN_GUJ = 2;
-        public static final int POLICESTATION_NAME = 3;
-        public static final int POLICESTATION_NAME_IN_GUJ = 4;
-
-
+    public static class PoliceStationIndex {
+        public static final int POLICESTATION_DISTRICT = 2;
+        public static final int POLICESTATION_DISTRICT_IN_GUJ = 3;
+        public static final int POLICESTATION_NAME = 4;
+        public static final int POLICESTATION_NAME_IN_GUJ = 5;
     }
 
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERs = { "designation", "fullName", "buckleNumber", "number", "policeStationName",
-            "district", "gender", "age" };
+    static String[] HEADERs = {"designation", "fullName", "buckleNumber", "number", "policeStationName",
+            "district", "gender", "age"};
     static String SHEET = "SHEET1";
 
     @Autowired
@@ -59,7 +61,7 @@ public class ExcelHelper {
         return TYPE.equals(file.getContentType());
     }
 
-    public List<Police> excelToPolice(InputStream is) {
+    public List<Police> excelToPolice(InputStream is, Event event){
 
         try {
             Workbook workbook = new XSSFWorkbook(is);
@@ -85,27 +87,37 @@ public class ExcelHelper {
 
                 int cellIdx = 1;
                 try {
+                    cellsInRow.next();
                     while (cellsInRow.hasNext()) {
                         DataFormatter formatter = new DataFormatter(); //creating formatter using the default locale
                         Cell currentCell = cellsInRow.next();
-                        String cellValue = formatter.formatCellValue(currentCell); //Returns the formatted value of a cell as a String regardless of the cell type.
+                        String cellValue = formatter.formatCellValue(currentCell).trim(); //Returns the formatted value of a cell as a String regardless of the cell type.
 
 
                         switch (cellIdx) {
                             case PoliceIndex.POLICE_DESIGNATION -> {
-                                Designation designation = designationService.getDesignationByName(cellValue);
+//                                System.out.println(cellValue);
+                                Designation designation = designationService.getDesignationByNameOrNameInGujarati(cellValue);
                                 police.setDesignation(designation);
                             }
                             case PoliceIndex.POLICE_FULLNAME -> police.setFullName(cellValue);
                             case PoliceIndex.POLICE_BUCKLE_NUMBER -> police.setBuckleNumber(cellValue);
-                            case PoliceIndex.POLICE_MOBILE_NUMBER -> police.setNumber(cellValue);
+                            case PoliceIndex.POLICE_MOBILE_NUMBER -> {
+                                if (RegExUtil.validPhone(cellValue)){
+                                    police.setNumber(cellValue);
+                                } else {
+                                    System.out.println(cellValue);
+                                    throw new ExcelException("Invalid phone number: " + cellValue);
+//                                    police.setNumber("0000000000");
+                                }
+                            }
                             case PoliceIndex.POLICE_STATION -> {
-                                PoliceStation policeStation = policeStationService.readSpecificByName(cellValue);
+                                PoliceStation policeStation = policeStationService.readSpecificByNameOrDemo(cellValue);
                                 police.setPoliceStation(policeStation);
                             }
                             case PoliceIndex.POLICE_DISTRICT -> police.setDistrict(cellValue);
                             case PoliceIndex.POLICE_GENDER -> police.setGender(cellValue);
-                            case PoliceIndex.POLICE_AGE -> police.setAge(Integer.parseInt(cellValue));
+                            case PoliceIndex.POLICE_AGE -> police.setAge(ObjectUtil.optIntegerDashToZero(cellValue,90));
                             default -> {
                                 logger.info("Unknown cell type: " + currentCell.getStringCellValue());
                             }
@@ -115,6 +127,7 @@ public class ExcelHelper {
                 } catch (Exception e) {
                     throw new ExcelException(e.getMessage() + " : " + e.getCause() + " : " + e.getLocalizedMessage() + " : " + Arrays.toString(e.getStackTrace()));
                 }
+                police.setEvent(event);
                 policeListFromExcel.add(police);
             }
 
@@ -153,29 +166,54 @@ public class ExcelHelper {
                 int cellIdx = 1;
                 try {
                     while (cellsInRow.hasNext()) {
-                        DataFormatter formatter = new DataFormatter(); //creating formatter using the default locale
                         Cell currentCell = cellsInRow.next();
-                        String cellValue = formatter.formatCellValue(currentCell); //Returns the formatted value of a cell as a String regardless of the cell type.
 
+                        if (cellIdx == 1) {
+                            cellIdx++;
+                            continue;
+                        }
+                        DataFormatter formatter = new DataFormatter(); //creating formatter using the default locale
+
+                        String cellValue = formatter.formatCellValue(currentCell).trim(); //Returns the formatted value of a cell as a String regardless of the cell type.
 
                         switch (cellIdx) {
                             case PoliceStationIndex.POLICESTATION_DISTRICT -> {
                                 policeStation.setDistrict(cellValue);
+//                                System.out.println(cellValue);
                             }
-                            case PoliceStationIndex.POLICESTATION_DISTRICT_IN_GUJ -> policeStation.setDistrictInGuj(cellValue);
-                            case PoliceStationIndex.POLICESTATION_NAME -> policeStation.setPoliceStationName(cellValue);
-                            case PoliceStationIndex.POLICESTATION_NAME_IN_GUJ -> policeStation.setPoliceStationNameInGujarati(cellValue);
+                            case PoliceStationIndex.POLICESTATION_DISTRICT_IN_GUJ -> {
+                                policeStation.setDistrictInGuj(cellValue);
+//                                System.out.println(cellValue);
+                            }
+                            case PoliceStationIndex.POLICESTATION_NAME -> {
+                                policeStation.setPoliceStationName(cellValue);
+//                                System.out.println(cellValue);
+                            }
+                            case PoliceStationIndex.POLICESTATION_NAME_IN_GUJ -> {
+                                policeStation.setPoliceStationNameInGujarati(cellValue);
+//                                System.out.println(cellValue);
+                            }
 
-                            default -> {
-                                logger.info("Unknown cell type: " + currentCell.getStringCellValue());
-                            }
+//                            default -> {
+//                                logger.info("Unknown cell type: " + currentCell.getStringCellValue() + " " + cellIdx);
+//                            }
                         }
                         cellIdx++;
                     }
                 } catch (Exception e) {
                     throw new ExcelException(e.getMessage() + " : " + e.getCause() + " : " + e.getLocalizedMessage() + " : " + Arrays.toString(e.getStackTrace()));
                 }
-                policeStationListFromExcel.add(policeStation);
+
+                policeStation.setAddress("-");
+                policeStation.setTaluko("-");
+                policeStation.setTalukoInGuj("-");
+                policeStation.setContactNumber("");
+                if (TextUtils.notBlankNotEmpty(policeStation.getPoliceStationName()) &&
+                        TextUtils.notBlankNotEmpty(policeStation.getPoliceStationNameInGujarati()) &&
+                        TextUtils.notBlankNotEmpty(policeStation.getDistrict()) &&
+                        TextUtils.notBlankNotEmpty(policeStation.getDistrictInGuj())) {
+                    policeStationListFromExcel.add(policeStation);
+                }
             }
 
             workbook.close();

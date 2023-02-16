@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-public class Event {
+public class Event extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -38,4 +38,23 @@ public class Event {
     @JsonIgnore
     @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST)
     private List<AssignPolice> assignPolice;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST)
+    private List<EventPoliceCount> eventPoliceCountList;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST)
+    private List<Police> policeList;
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", eventName='" + eventName + '\'' +
+                ", eventDetails='" + eventDetails + '\'' +
+                ", eventStartDate=" + eventStartDate +
+                ", eventEndDate=" + eventEndDate +
+                '}';
+    }
 }

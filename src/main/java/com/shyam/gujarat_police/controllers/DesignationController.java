@@ -1,6 +1,9 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.dto.request.DesignationListDto;
+import com.shyam.gujarat_police.dto.request.FindByDesignationDto;
 import com.shyam.gujarat_police.entities.Designation;
+import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.DesignationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,29 +21,43 @@ public class DesignationController {
     private DesignationService designationService;
 
     @GetMapping("/")
-    public List<Designation> getAllDesignations() {
-        return designationService.getAllDesignations();
+    public APIResponse getAllDesignations() {
+        return APIResponse.ok(designationService.getAllDesignations());
     }
 
     @PostMapping("/")
-    public Designation saveDesignation(@RequestBody @NotNull @Valid Designation designation) {
-        return designationService.saveDesignation(designation);
+    public APIResponse saveDesignation(@RequestBody @NotNull @Valid Designation designation) {
+        Designation dto = designationService.saveDesignation(designation);
+        return APIResponse.ok(dto);
+    }
+    @PostMapping("/in-bulk")
+    public APIResponse saveDesignationInBulk(@RequestBody DesignationListDto designationList) {
+        List<Designation> dto = designationService.saveDesignationsFromList(designationList);
+        return APIResponse.ok(dto);
     }
 
     @PutMapping("/{designationId}")
-    public Designation updateDesignation(@RequestBody @NotNull @Valid Designation designation,
+    public APIResponse updateDesignation(@RequestBody FindByDesignationDto designation,
             @PathVariable("designationId") Long designationId){
-        return designationService.updateDesignation(designation, designationId);
+        Designation dto = designationService.updateDesignation(designation, designationId);
+        return APIResponse.ok(dto);
     }
 
     @GetMapping("/{designationId}")
-    public Designation readSpecific(@PathVariable("designationId") Long designationId){
-        return designationService.getDesignationById(designationId);
+    public APIResponse readSpecific(@PathVariable("designationId") Long designationId){
+        Designation dto = designationService.getDesignationById(designationId);
+        return APIResponse.ok(dto);
     }
 
     @DeleteMapping("/{designationId}")
-    public String deleteDesignation(@PathVariable("designationId") Long designationId){
+    public APIResponse deleteDesignation(@PathVariable("designationId") Long designationId){
         designationService.deleteDesignation(designationId);
-        return "Designation deleted successfully with id " + designationId;
+        return APIResponse.ok("Designation deleted successfully with id " + designationId);
+    }
+
+    @GetMapping("/find-by")
+    public APIResponse findByDesignation(@RequestBody FindByDesignationDto dto){
+        List<Designation> resp = designationService.findInDesignation(dto);
+        return APIResponse.ok(resp);
     }
 }

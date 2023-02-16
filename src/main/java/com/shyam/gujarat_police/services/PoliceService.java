@@ -2,12 +2,16 @@ package com.shyam.gujarat_police.services;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.shyam.gujarat_police.dto.request.CreatePoliceDto;
+import com.shyam.gujarat_police.entities.Designation;
+import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Police;
+import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
+import com.shyam.gujarat_police.response.APIResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,17 +24,45 @@ public class PoliceService {
     @Autowired
     private PoliceRepository policeRepository;
 
+    @Autowired
+    private DesignationService designationService;
+
+    @Autowired
+    private PoliceStationService policeStationService;
+
+    @Autowired
+    private EventService eventService;
+
     public List<Police> getAllPolice() {
         return (List<Police>) policeRepository.findAll();
     }
 
-    public Police savePolice(Police police) {
-        if (isUniqueBuckleNumber(police.getBuckleNumber())){
+    public Police savePolice(CreatePoliceDto dto) {
+        // unique buckle number && designation exists? && policeStation exists?
+        if (isUniqueBuckleNumber(dto.getBuckleNumber())){
+            Police police = createPoliceFromDto(dto);
             return policeRepository.save(police);
         } else {
             throw new DataAlreadyExistException("Police already exists with buckleNumber "
-                    + police.getBuckleNumber() + " with police Name : " + police.getFullName());
+                    + dto.getBuckleNumber() + " with police Name : " + dto.getFullName());
         }
+    }
+
+    private Police createPoliceFromDto(CreatePoliceDto dto) {
+        Event event = eventService.readSpecific(dto.getEventId());
+        Police police = new Police();
+        police.setAge(Integer.parseInt(dto.getAge()));
+        police.setBuckleNumber(dto.getBuckleNumber());
+        police.setDistrict(dto.getDistrict());
+        police.setFullName(dto.getFullName());
+        police.setGender(dto.getGender());
+        police.setNumber(dto.getNumber());
+        Designation designation = designationService.getDesignationById(dto.getDesignation());
+        police.setDesignation(designation);
+        PoliceStation policeStation = policeStationService.readSpecificById(dto.getPoliceStation());
+        police.setPoliceStation(policeStation);
+        police.setEvent(event);
+        return police;
     }
 
     public void deletePolice(Long id) {
@@ -54,6 +86,7 @@ public class PoliceService {
             obtainedPolice.setGender(police.getGender());
             obtainedPolice.setDesignation(police.getDesignation());
             obtainedPolice.setPoliceStation(police.getPoliceStation());
+            obtainedPolice.setEvent(police.getEvent());
             return policeRepository.save(obtainedPolice);
         }
     }
@@ -63,13 +96,47 @@ public class PoliceService {
                 .orElseThrow(()->new DataNotFoundException("Police not found with id: " + policeId));
     }
 
-    public ResponseEntity<?> officerData() throws JsonProcessingException {
+    public APIResponse officerData() throws JsonProcessingException {
         List<Police> policeList = (List<Police>) policeRepository.findAll();
-        return ResponseEntity.ok( policeList );
+        return APIResponse.ok( policeList );
     }
 
     private boolean isUniqueBuckleNumber(String buckleNumber){
         Optional<Police> isPoliceExists = policeRepository.findByBuckleNumber(buckleNumber);
         return isPoliceExists.isEmpty();
+    }
+
+    public int saveMultiple(List<Police> policeListFromExcel) {
+        List<Police> uniquePolice = policeListFromExcel.stream().
+                filter(police -> !isPoliceExists(police)).toList();
+        policeRepository.saveAll(uniquePolice);
+        return uniquePolice.size();
+    }
+
+    private boolean isPoliceExists(Police station){
+        return policeRepository.isPoliceExists(station);
+    }
+
+    public APIResponse countPolice() {
+        return APIResponse.ok(policeRepository.count());
+    }
+
+    public APIResponse countPoliceByEvent(Long eventId) {
+        Event event = eventService.readSpecific(eventId);
+        Integer policeObtainedForEvent = event.getPoliceList().size();
+        return APIResponse.ok(policeObtainedForEvent);
+    }
+
+    public List<Police> getUnassignedPoliceOfDesignation(Long eventId, Long designationId) {
+
+        List<Police> unassignedPolice = policeRepository.getUnassignedPoliceOfDesignation(eventId, designationId);
+        if (unassignedPolice.size() == 0) {
+            throw new DataNotFoundException("No free Police found for designation with id " + designationId);
+        }
+        return unassignedPolice;
+    }
+
+    public List<Police> getPoliceByIds(List<Long> policeIds) {
+        return (List<Police>) policeRepository.findAllById(policeIds);
     }
 }

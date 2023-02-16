@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Point {
+public class Point extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -29,6 +29,16 @@ public class Point {
 
     @NotEmpty(message = "{validation.name.NotEmpty}")
     private String pointName;
+
+//    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String accessories;
+
+//    @NotEmpty(message = "{validation.name.NotEmpty}")
+    private String remarks;
+
+    @ManyToOne
+    @JoinColumn(name = "zone_id")
+    private Zone zone;
 
     @JsonIgnore
     @OneToMany(mappedBy = "point", cascade = CascadeType.PERSIST)
