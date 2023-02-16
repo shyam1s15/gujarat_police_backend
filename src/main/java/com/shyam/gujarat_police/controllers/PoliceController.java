@@ -72,7 +72,7 @@ public class PoliceController {
             message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
             return APIResponse.ok(message);
         }
-        return APIResponse.ok("Something went wrong");
+        return APIResponse.error("Something went wrong");
     }
 
     @GetMapping("/count")
