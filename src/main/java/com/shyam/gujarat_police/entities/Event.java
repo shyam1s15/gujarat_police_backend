@@ -47,6 +47,8 @@ public class Event extends BaseModel {
     @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST)
     private List<Police> policeList;
 
+
+
     @Override
     public String toString() {
         return "Event{" +

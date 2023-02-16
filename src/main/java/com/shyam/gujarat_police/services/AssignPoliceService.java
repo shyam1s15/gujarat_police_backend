@@ -77,7 +77,9 @@ public class AssignPoliceService {
 
     }
 
-
+    /*
+    * used to assign individual police.
+    * */
     public AssignPolice saveAssignPoliceV2(AssignPoliceDto dto) {
         List<Event> eventsBetweenGivenEvent = eventService.getEventsBetweenGivenEvent(dto.getEventId());
         List<Long> eventIds = eventsBetweenGivenEvent.stream().map(Event::getId).toList();
@@ -251,6 +253,9 @@ public class AssignPoliceService {
 //        return assignedPoliceList;
 //    }
 
+    /*
+    * This method will assign police in given point automatically, but count must be given
+    * */
     public List<AssignPolice> saveAssignPoliceByDesignation(AssignPoliceByDesignationCountDto dto) {
         // check if event exists
         Event event = eventService.readSpecific(dto.getEventId());
@@ -329,6 +334,9 @@ public class AssignPoliceService {
 
 
     }
+    /*
+    * It does not compare with previous assignments & assignments given in PointPoliceCount Entity
+    * */
     private List<Police> assignByDesignationCountForPoint(DesignationCountRespDto designationCount, AssignPoliceDto dto){
         Point point = pointService.readSpecific(dto.getPointId());
         Event event = eventService.readSpecific(dto.getEventId());
@@ -483,6 +491,10 @@ public class AssignPoliceService {
         });
         resp.setPointAssignments(pointAssignmentList);
         return resp;
+    }
+
+    public APIResponse assignAutomaticallyAllPoints(Long eventId) {
+        return null;
     }
 
 //    public E
