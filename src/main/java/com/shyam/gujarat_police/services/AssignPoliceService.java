@@ -401,6 +401,7 @@ public class AssignPoliceService {
             police.setNumber(assignment.getPolice().getNumber());
             police.setAge(Integer.toString(assignment.getPolice().getAge()));
             police.setDistrict(assignment.getPolice().getDistrict());
+            police.setDesignation(assignment.getPolice().getDesignation().getName());
             return police;
         }).toList();
         resp.setAssignedPoliceList(assignedPoliceForce);
