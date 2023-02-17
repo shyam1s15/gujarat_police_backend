@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.dto.request.CreatePoliceDto;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.helper.ExcelHelper;
+import com.shyam.gujarat_police.io.ExcelDataObject;
+import com.shyam.gujarat_police.io.XlsReader;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.ExcelService;
 import com.shyam.gujarat_police.services.PoliceService;
+import com.shyam.gujarat_police.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.IOException;
 
 @RestController
@@ -63,15 +67,20 @@ public class PoliceController {
     }
 
     @PostMapping("/upload-from-excel")
-    public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile file,
+    public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile multiPartFile,
                                        @RequestParam("event-id") Long eventId) throws IOException {
         String message = "";
         System.out.println(eventId);
-        if (ExcelHelper.hasExcelFormat(file)){
-            int totalPoliceInserted = excelService.savePoliceFromExcel(file, eventId);
-            message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
-            return APIResponse.ok(message);
+        if (!multiPartFile.isEmpty()) {
+            File file = FileUtils.multipartToFile(multiPartFile, multiPartFile.getName());
+//            XlsReader reader = new XlsReader(orderUpdateSkusProcessor);
+//            ExcelDataObject data = reader.read(file);
         }
+//            if (ExcelHelper.hasExcelFormat(file)){
+//            int totalPoliceInserted = excelService.savePoliceFromExcel(file, eventId);
+//            message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
+//            return APIResponse.ok(message);
+//        }
         return APIResponse.error("Something went wrong");
     }
 
