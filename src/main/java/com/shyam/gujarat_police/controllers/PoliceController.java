@@ -66,7 +66,7 @@ public class PoliceController {
     public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile file,
                                        @RequestParam("event-id") Long eventId) throws IOException {
         String message = "";
-
+        System.out.println(eventId);
         if (ExcelHelper.hasExcelFormat(file)){
             int totalPoliceInserted = excelService.savePoliceFromExcel(file, eventId);
             message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
