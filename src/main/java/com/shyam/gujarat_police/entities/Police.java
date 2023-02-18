@@ -37,9 +37,8 @@ public class Police extends BaseModel {
     @Length(min = 1,max = 50, message = "{validation.name.Size}")
     private String district;
 
-    @NotEmpty(message = "{validation.name.NotEmpty}")
-    @Length(min = 1,max = 10, message = "{validation.name.Size}")
     private String gender;
+
     @ManyToOne
 //    @JsonIgnore
     @JoinColumn(name = "policeStation_id")
@@ -59,4 +58,19 @@ public class Police extends BaseModel {
 
     @Column(columnDefinition="boolean default 'false'")
     private boolean isAssigned = false;
+
+
+    @Override
+    public String toString() {
+        return "Police{" +
+                "id=" + id +
+                ", fullName='" + fullName + '\'' +
+                ", buckleNumber='" + buckleNumber + '\'' +
+                ", number='" + number + '\'' +
+                ", age=" + age +
+                ", district='" + district + '\'' +
+                ", gender='" + gender + '\'' +
+                ", isAssigned=" + isAssigned +
+                '}';
+    }
 }

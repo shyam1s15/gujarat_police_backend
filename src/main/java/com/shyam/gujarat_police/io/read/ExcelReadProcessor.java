@@ -5,7 +5,10 @@ import com.shyam.gujarat_police.io.ExcelDataObject;
 
 public interface ExcelReadProcessor<Sheet> {
 
-    ExcelDataObject processSheet(Sheet sheet, ExcelDataObject obj) throws CustomException;
+    /*
+    * param could be null, it is provided to
+    * */
+    ExcelDataObject processSheet(Sheet sheet, ExcelDataObject obj, Object param) throws CustomException;
 
     void initMethod(String firebaseNode);
 }

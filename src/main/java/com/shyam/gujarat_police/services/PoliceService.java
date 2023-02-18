@@ -9,11 +9,23 @@ import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
+import com.shyam.gujarat_police.io.ExcelDataObject;
+import com.shyam.gujarat_police.io.XlsReader;
+import com.shyam.gujarat_police.io.dto.PoliceImportExcelDto;
+import com.shyam.gujarat_police.io.read.ExcelReadProcessor;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.response.APIResponse;
+import com.shyam.gujarat_police.util.ImportUtil;
+import com.shyam.gujarat_police.util.ObjectUtil;
+import com.shyam.gujarat_police.util.RegExUtil;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,18 +45,38 @@ public class PoliceService {
     @Autowired
     private EventService eventService;
 
+
+    @Autowired
+    @Qualifier("police_import_processor")
+    private ExcelReadProcessor<Sheet> policeImportProcessor;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoliceService.class);
+
+
     public List<Police> getAllPolice() {
         return (List<Police>) policeRepository.findAll();
     }
 
     public Police savePolice(CreatePoliceDto dto) {
         // unique buckle number && designation exists? && policeStation exists?
-        if (isUniqueBuckleNumber(dto.getBuckleNumber())){
+        if (isUniqueBuckleNumberInEvent(dto.getBuckleNumber(), dto.getEventId())){
             Police police = createPoliceFromDto(dto);
             return policeRepository.save(police);
         } else {
             throw new DataAlreadyExistException("Police already exists with buckleNumber "
                     + dto.getBuckleNumber() + " with police Name : " + dto.getFullName());
+        }
+    }
+
+    // create new method to save police
+    public APIResponse savePoliceForExcel(CreatePoliceDto dto){
+        if (isUniqueBuckleNumberInEvent(dto.getBuckleNumber(), dto.getEventId())){
+            Police police = createPoliceFromDto(dto);
+            policeRepository.save(police);
+            return APIResponse.ok();
+        } else {
+            throw new DataAlreadyExistException("Police already exists with buckleNumber "
+                    + dto.getBuckleNumber() + " with police Name : " + dto.getFullName() + " in event");
         }
     }
 
@@ -101,8 +133,8 @@ public class PoliceService {
         return APIResponse.ok( policeList );
     }
 
-    private boolean isUniqueBuckleNumber(String buckleNumber){
-        Optional<Police> isPoliceExists = policeRepository.findByBuckleNumber(buckleNumber);
+    private boolean isUniqueBuckleNumberInEvent(String buckleNumber, Long eventId){
+        Optional<Police> isPoliceExists = policeRepository.getByBuckleNumberAndEventId(buckleNumber, eventId);
         return isPoliceExists.isEmpty();
     }
 
@@ -138,5 +170,47 @@ public class PoliceService {
 
     public List<Police> getPoliceByIds(List<Long> policeIds) {
         return (List<Police>) policeRepository.findAllById(policeIds);
+    }
+
+    public APIResponse savePoliceFromExcel(PoliceImportExcelDto policeImport, Event event) {
+        if (!RegExUtil.isNumber(policeImport.getMobileNumber())){
+            return APIResponse.error("Police number must be a valid mobile number of police" + policeImport.getMobileNumber());
+        }
+        if (isUniqueBuckleNumberInEvent(policeImport.getBuckleNo(), event.getId())){
+            Police police = new Police();
+            Designation designation = designationService.getDesignationByNameOrNameInGujarati(policeImport.getDesignation());
+            PoliceStation policeStation = policeStationService.readSpecificByNameOrDemo(policeImport.getPoliceStationName());
+
+            police.setEvent(event);
+            police.setPoliceStation(policeStation);
+            police.setDesignation(designation);
+            police.setGender(policeImport.getGender());
+            police.setNumber(policeImport.getMobileNumber());
+            Integer age = ObjectUtil.optInteger(policeImport.getAge());
+            age = age == null ? 0 : age;
+            police.setAge(age);
+            police.setDistrict(policeImport.getDistrict());
+            police.setAssigned(false);
+            police.setBuckleNumber(policeImport.getBuckleNo());
+            police.setFullName(policeImport.getOfficerName());
+            try {
+                policeRepository.save(police);
+            } catch (Exception e) {
+                LOGGER.info(police.toString());
+                LOGGER.error(e.getMessage());
+            }
+            return APIResponse.ok();
+        } else {
+            APIResponse.error("Police already exists with buckle number " + policeImport.getBuckleNo() + " with name " + policeImport.getOfficerName() + " in event : " + event.getEventName());
+        };
+        return APIResponse.error("something went Wrong or all police in excel already exists");
+    }
+
+    public APIResponse uploadFromExcel(File file, Long eventId) {
+        XlsReader reader = new XlsReader(policeImportProcessor);
+        ExcelDataObject data = reader.read(file, eventId);
+        String fileName = ImportUtil.createOrderUpdateErrorFile(data);
+        LOGGER.error("Upload_police_from_excel completed::success" + data.getSuccessCount() + ":failure::" + data.getFailureCount());
+        return APIResponse.ok(fileName);
     }
 }

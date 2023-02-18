@@ -36,7 +36,7 @@ public class XlsReader {
         this.excelParser.initMethod(pigeonNo);
     }
 
-    public ExcelDataObject read(File file) {
+    public ExcelDataObject read(File file, Object param) {
 
         if (Objects.nonNull(file)) {
             OPCPackage pkg = null;
@@ -50,7 +50,7 @@ public class XlsReader {
                     for (Sheet sheet : workbook) {
                         if (Objects.nonNull(sheet)) {
                             if (!"ReadMe".equalsIgnoreCase(sheet.getSheetName())) {
-                                ExcelDataObject data = excelParser.processSheet(sheet, excelDataObj);
+                                ExcelDataObject data = excelParser.processSheet(sheet, excelDataObj, param);
                             }
 
                         }
@@ -65,7 +65,7 @@ public class XlsReader {
                         if (Objects.nonNull(sheet)) {
                             if (!"ReadMe".equalsIgnoreCase(sheet.getSheetName())) {
                                 if (sheet.getPhysicalNumberOfRows() > 0) {
-                                    ExcelDataObject data = excelParser.processSheet(sheet, excelDataObj);
+                                    ExcelDataObject data = excelParser.processSheet(sheet, excelDataObj, param);
                                 }
                             }
                         }

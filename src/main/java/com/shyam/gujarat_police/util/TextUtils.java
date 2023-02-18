@@ -1,6 +1,8 @@
 package com.shyam.gujarat_police.util;
 
 
+import com.shyam.gujarat_police.exceptions.CustomException;
+
 /**
  * @since 4.3
  */
@@ -37,7 +39,12 @@ public final class TextUtils {
         }
         return s.trim().length() != 0;
     }
-
+    public static String notBlankNotEmptyWithDefault(String s, String defaultValue){
+        if (s == null){
+            return defaultValue;
+        }
+        return s.trim().length() == 0 ? defaultValue : s;
+    }
     /**
      * @since 4.4
      */
@@ -51,6 +58,13 @@ public final class TextUtils {
             }
         }
         return false;
+    }
+
+    public static String notBlankNotEmptyOrError(String s, String errorMsg) {
+        if (notBlankNotEmpty(s)){
+            return s;
+        }
+        throw new CustomException(errorMsg);
     }
 
 }

@@ -3,9 +3,6 @@ package com.shyam.gujarat_police.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.dto.request.CreatePoliceDto;
 import com.shyam.gujarat_police.entities.Police;
-import com.shyam.gujarat_police.helper.ExcelHelper;
-import com.shyam.gujarat_police.io.ExcelDataObject;
-import com.shyam.gujarat_police.io.XlsReader;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.ExcelService;
 import com.shyam.gujarat_police.services.PoliceService;
@@ -73,8 +70,7 @@ public class PoliceController {
         System.out.println(eventId);
         if (!multiPartFile.isEmpty()) {
             File file = FileUtils.multipartToFile(multiPartFile, multiPartFile.getName());
-//            XlsReader reader = new XlsReader(orderUpdateSkusProcessor);
-//            ExcelDataObject data = reader.read(file);
+            return policeService.uploadFromExcel(file, eventId);
         }
 //            if (ExcelHelper.hasExcelFormat(file)){
 //            int totalPoliceInserted = excelService.savePoliceFromExcel(file, eventId);

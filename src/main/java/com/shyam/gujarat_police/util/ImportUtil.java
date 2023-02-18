@@ -1,9 +1,11 @@
 package com.shyam.gujarat_police.util;
 
+import com.shyam.gujarat_police.io.ExcelDataObject;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.io.FileWriter;
 import java.util.*;
 
 public class ImportUtil {
@@ -91,6 +93,40 @@ public class ImportUtil {
 		} else {
 			return temporaryHeader;
 		}
+	}
+
+	public static String createOrderUpdateErrorFile(ExcelDataObject importProcessResult) {
+		FileWriter fw = null;
+		String fileName = null;
+		try {
+			fileName = FileUtils.createTempFile("txt");
+			fw = new FileWriter(fileName);
+			fw.write("\nSuccessfully Inserted: " + importProcessResult.getSuccessCount());
+			fw.write("\nFailed: " + importProcessResult.getFailureCount());
+
+			if (importProcessResult.getErrorList().size() > 0) {
+				fw.write("\n\nErrors:");
+			}
+			StringBuilder sb = new StringBuilder("");
+
+			importProcessResult.getErrorList().forEach(v -> {
+				sb.append("\n" + v);
+
+			});
+			fw.write(sb.toString());
+
+		} catch (Exception e) {
+		} finally {
+			try {
+				if (Objects.nonNull(fw))
+					fw.close();
+			} catch (Exception e) {
+
+			}
+		}
+
+		return fileName;
+
 	}
 
 }
