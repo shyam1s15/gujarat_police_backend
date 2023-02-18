@@ -77,7 +77,9 @@ public class AssignPoliceService {
 
     }
 
-
+    /*
+    * used to assign individual police.
+    * */
     public AssignPolice saveAssignPoliceV2(AssignPoliceDto dto) {
         List<Event> eventsBetweenGivenEvent = eventService.getEventsBetweenGivenEvent(dto.getEventId());
         List<Long> eventIds = eventsBetweenGivenEvent.stream().map(Event::getId).toList();
@@ -251,6 +253,9 @@ public class AssignPoliceService {
 //        return assignedPoliceList;
 //    }
 
+    /*
+    * This method will assign police in given point automatically, but count must be given
+    * */
     public List<AssignPolice> saveAssignPoliceByDesignation(AssignPoliceByDesignationCountDto dto) {
         // check if event exists
         Event event = eventService.readSpecific(dto.getEventId());
@@ -329,6 +334,9 @@ public class AssignPoliceService {
 
 
     }
+    /*
+    * It does not compare with previous assignments & assignments given in PointPoliceCount Entity
+    * */
     private List<Police> assignByDesignationCountForPoint(DesignationCountRespDto designationCount, AssignPoliceDto dto){
         Point point = pointService.readSpecific(dto.getPointId());
         Event event = eventService.readSpecific(dto.getEventId());
@@ -393,6 +401,7 @@ public class AssignPoliceService {
             police.setNumber(assignment.getPolice().getNumber());
             police.setAge(Integer.toString(assignment.getPolice().getAge()));
             police.setDistrict(assignment.getPolice().getDistrict());
+            police.setDesignation(assignment.getPolice().getDesignation().getName());
             return police;
         }).toList();
         resp.setAssignedPoliceList(assignedPoliceForce);
@@ -469,6 +478,7 @@ public class AssignPoliceService {
                     police.setNumber(assignment.getPolice().getNumber());
                     police.setAge(Integer.toString(assignment.getPolice().getAge()));
                     police.setDistrict(assignment.getPolice().getDistrict());
+                    police.setDesignation(assignment.getPolice().getDesignation().getName());
                     return police;
                 }).toList();
                 pointAssignment.setAssignedPoliceList(assignedPoliceForce);
@@ -483,6 +493,18 @@ public class AssignPoliceService {
         });
         resp.setPointAssignments(pointAssignmentList);
         return resp;
+    }
+
+    /*
+    *   assign police in best of designations given from total police by designation
+    *   police should be automatically assigned <= pointPoliceCount
+    * */
+    public APIResponse assignAutomaticallyAllPoints(Long eventId) {
+        Event event = eventService.readSpecific(eventId);
+        List<PointDto> allPoints = pointService.getPoints();
+        List<PointPoliceCount> pointPoliceCounts = pointPoliceCountService.getAllPointPoliceCount();
+
+        return null;
     }
 
 //    public E

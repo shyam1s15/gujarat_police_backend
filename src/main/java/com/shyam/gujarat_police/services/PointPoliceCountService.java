@@ -38,6 +38,9 @@ public class PointPoliceCountService {
         return (List<PointPoliceCount>) pointPoliceCountRepository.findAll();
     }
 
+    public List<PointPoliceCount> getAllPointCountsByEvent(Long eventId) {
+        return pointPoliceCountRepository.findByEventId(eventId);
+    }
     public PointPoliceCount savePointPoliceCountIndividual(PointPoliceCountDto dto, Boolean isSave) {
         // check event exists
         // check designation exists
