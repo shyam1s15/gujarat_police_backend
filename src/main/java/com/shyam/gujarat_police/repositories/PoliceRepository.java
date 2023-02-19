@@ -31,4 +31,9 @@ public interface PoliceRepository extends PagingAndSortingRepository<Police, Lon
     @Modifying
     @Query("update Police p set p.isAssigned = true where p.id in (?1)")
     void updatePoliceAssignStatusAssigned(List<Long> ids);
+
+    @Transactional
+    @Modifying
+    @Query("update Police p set p.isAssigned = false where p.event.id = ?1")
+    int unAssignFromEventId(Long eventId);
 }

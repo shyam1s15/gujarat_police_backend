@@ -85,8 +85,8 @@ public class AssignPoliceController {
         return APIResponse.ok(o);
     }
 
-    @GetMapping("assign_automatically_all_points")
-    public APIResponse assignAutomaticallyAllPoints(@RequestBody Long eventId){
+    @GetMapping("assign_automatically_all_points/{eventId}")
+    public APIResponse assignAutomaticallyAllPoints(@PathVariable("eventId") Long eventId){
         return assignPoliceService.assignAutomaticallyAllPoints(eventId);
     }
 }

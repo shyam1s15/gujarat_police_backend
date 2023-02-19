@@ -160,4 +160,14 @@ public class PointPoliceCountService {
     public List<EventPoliceCountAssignmentRowDto> readAllInAssignmentFormat() {
         return null;
     }
+
+    public List<EventPointPoliceCountAssignmentRespDto> getAllPointPoliceCountForEvent(Long eventId) {
+        List<Long> pointsInEvent = pointPoliceCountRepository.getAllPointIdsForEvent(eventId);
+        List<EventPointPoliceCountAssignmentRespDto> eventAssignmentList = new ArrayList<>();
+        pointsInEvent.stream().forEach(point -> {
+            EventPointPoliceCountAssignmentRespDto dto = readAllByPointDesignationCountsAndEventName(eventId, point);
+            eventAssignmentList.add(dto);
+        });
+        return eventAssignmentList;
+    }
 }

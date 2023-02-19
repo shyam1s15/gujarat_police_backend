@@ -69,10 +69,11 @@ public class PointPoliceCountController {
 
     @GetMapping("/event-and-point")
     public APIResponse readAllByEvent(@RequestBody EventAndPointIdDto dto){
-        Long eventId = dto.getEventId();
-        Long pointId = dto.getPointId();
-        List<PointPoliceCount> resp = pointPoliceCountService.readAllByEventAndPoint(eventId, pointId);
-        return APIResponse.ok(resp);
+//        Long eventId = dto.getEventId();
+//        Long pointId = dto.getPointId();
+//        List<PointPoliceCount> resp = pointPoliceCountService.readAllByEventAndPoint(eventId, pointId);
+//        return APIResponse.ok(resp);
+        return APIResponse.error("deprecated & need work on backend to reconstruct it.");
     }
 
     @PostMapping("/designation-counts")
