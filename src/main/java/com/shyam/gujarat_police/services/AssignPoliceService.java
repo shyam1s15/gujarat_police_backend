@@ -513,7 +513,6 @@ public class AssignPoliceService {
         List<EventPointPoliceCountAssignmentRespDto> pointPoliceCounts = pointPoliceCountService.getAllPointPoliceCountForEvent(eventId);
         AtomicInteger newAssignedCount = new AtomicInteger();
         AtomicInteger totalRequestedPolice = new AtomicInteger();
-        AtomicInteger totalAssignedCount = new AtomicInteger();
         pointPoliceCounts.stream().forEach(requiredPointPoliceCount -> {
             requiredPointPoliceCount.getAssignments().stream().forEach(
                     assignment -> {
@@ -537,11 +536,10 @@ public class AssignPoliceService {
                                 newAssignedCount.addAndGet(assignedPolice.size());
                             }
                         }
-                        totalAssignedCount.addAndGet((newAssignedCount.get() + previousAssignment));
                     }
             );
         });
-        return APIResponse.ok("new Police assigned " + newAssignedCount.get() + ", total asked " + totalRequestedPolice.get() + ", total assigned " + totalAssignedCount.get());
+        return APIResponse.ok("new Police assigned " + newAssignedCount.get() + ", total asked " + totalRequestedPolice.get());
     }
 
 //    public E
