@@ -13,8 +13,8 @@ public class InternalPurpose {
     @Autowired
     private InternalPurposeService internalPurposeService;
 
-    @DeleteMapping("/assign-police/reset-event-police/{event-id}")
-    public APIResponse deleteAssignmentsInEntireEvent(@PathVariable Long eventId) {
+    @DeleteMapping("/assign-police/reset-event-police/{eventId}")
+    public APIResponse deleteAssignmentsInEntireEvent(@PathVariable("eventId") Long eventId) {
         return internalPurposeService.deleteAssignmentsInEntireEvent(eventId);
     }
 }
