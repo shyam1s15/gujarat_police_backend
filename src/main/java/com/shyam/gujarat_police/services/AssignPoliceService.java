@@ -7,6 +7,7 @@ import com.shyam.gujarat_police.exceptions.*;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.response.APIResponse;
+import com.shyam.gujarat_police.util.CollectionUtil;
 import com.shyam.gujarat_police.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -325,7 +326,7 @@ public class AssignPoliceService {
 //        System.out.println(designationCountRespDtoList.get(0).getDesignationId());
         AtomicInteger totalAssignedPolice = new AtomicInteger();
         designationCountRespDtoList.forEach(d -> {
-            List<Police> assignedPolice = assignByDesignationCountForPoint(d, dto);
+            List<Police> assignedPolice = assignByDesignationCountForPoint(d, dto, false);
             totalAssignedPolice.addAndGet(assignedPolice.size());
         });
         return totalAssignedPolice;
@@ -337,9 +338,13 @@ public class AssignPoliceService {
     /*
     * It does not compare with previous assignments & assignments given in PointPoliceCount Entity
     * */
-    private List<Police> assignByDesignationCountForPoint(DesignationCountRespDto designationCount, AssignPoliceDto dto){
+    private List<Police> assignByDesignationCountForPoint(DesignationCountRespDto designationCount, AssignPoliceDto dto, boolean isAutoAssignment){
         Point point = pointService.readSpecific(dto.getPointId());
         Event event = eventService.readSpecific(dto.getEventId());
+        dto.setAssignedDate(dto.getAssignedDate() == null ? DateUtil.dateToString(new Date(),"dd/MM/yyyy") : dto.getAssignedDate());
+        dto.setDutyStartDate(dto.getDutyStartDate() == null ? DateUtil.dateToString(event.getEventStartDate(), "dd/MM/yyyy") : dto.getDutyStartDate());
+        dto.setDutyEndDate(dto.getDutyEndDate() == null ? DateUtil.dateToString(event.getEventEndDate(), "dd/MM/yyyy") : dto.getDutyEndDate());
+
         // check if police is already assigned for specified designation
         Integer previousAssignment = assignPoliceRepository.getPreviousAssignmentForDesignation(dto.getEventId(), dto.getPointId(), designationCount.getDesignationId());
         // find free police of event's and of designation which are unassigned
@@ -347,7 +352,9 @@ public class AssignPoliceService {
         List<Police> unassignedPoliceOfDesignation = policeService.getUnassignedPoliceOfDesignation(dto.getEventId(),designationCount.getDesignationId());
         // if required police are more then throw error
         if(requiredCount > unassignedPoliceOfDesignation.size()){
-            throw new InsufficientDataException("Unavailable police with designation count " + designationCount.getDesignationCount() + " only available are " + unassignedPoliceOfDesignation.size());
+            // returning null when autoassignment operation running. as want to assign best case.
+            if (isAutoAssignment){return null;}
+            throw new InsufficientDataException("Unavailable police with designation " + designationCount.getDesignationName() + " count " + designationCount.getDesignationCount() + " only available are " + unassignedPoliceOfDesignation.size());
         }
         List<Police> policeToBeAssignedList = new ArrayList<Police>();
         List<AssignPolice> assignPoliceList = new ArrayList<AssignPolice>();
@@ -502,9 +509,37 @@ public class AssignPoliceService {
     public APIResponse assignAutomaticallyAllPoints(Long eventId) {
         Event event = eventService.readSpecific(eventId);
         List<PointDto> allPoints = pointService.getPoints();
-        List<PointPoliceCount> pointPoliceCounts = pointPoliceCountService.getAllPointPoliceCount();
+        // it has all information about which point requires how many police of designation
+        List<EventPointPoliceCountAssignmentRespDto> pointPoliceCounts = pointPoliceCountService.getAllPointPoliceCountForEvent(eventId);
+        AtomicInteger newAssignedCount = new AtomicInteger();
+        AtomicInteger totalRequestedPolice = new AtomicInteger();
+        pointPoliceCounts.stream().forEach(requiredPointPoliceCount -> {
+            requiredPointPoliceCount.getAssignments().stream().forEach(
+                    assignment -> {
+                        totalRequestedPolice.addAndGet(assignment.getDesignationCount());
+                        // if previous assignment is less than current requirement than assign more
+                        Integer previousAssignment = assignPoliceRepository.getPreviousAssignmentForDesignation(eventId, requiredPointPoliceCount.getPointId(), assignment.getDesignationId());
+                        previousAssignment = previousAssignment == null ? 0 : previousAssignment;
 
-        return null;
+                        if (previousAssignment < assignment.getDesignationCount()) {
+                            DesignationCountRespDto designationCount = new DesignationCountRespDto();
+                            designationCount.setDesignationCount(assignment.getDesignationCount()-previousAssignment);
+                            designationCount.setDesignationId(assignment.getDesignationId());
+                            designationCount.setDesignationName(assignment.getDesignationName());
+
+                            AssignPoliceDto assignPoliceDto = new AssignPoliceDto();
+                            assignPoliceDto.setEventId(eventId);
+                            assignPoliceDto.setPointId(requiredPointPoliceCount.getPointId());
+                            List<Police> assignedPolice = assignByDesignationCountForPoint(designationCount, assignPoliceDto, true);
+                            if (CollectionUtil.nonNullNonEmpty(assignedPolice)) {
+                                assert assignedPolice != null;
+                                newAssignedCount.addAndGet(assignedPolice.size());
+                            }
+                        }
+                    }
+            );
+        });
+        return APIResponse.ok("new Police assigned " + newAssignedCount.get() + ", total asked " + totalRequestedPolice.get());
     }
 
 //    public E

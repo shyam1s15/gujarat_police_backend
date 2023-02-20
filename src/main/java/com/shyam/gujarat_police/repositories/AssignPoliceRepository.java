@@ -1,10 +1,12 @@
 package com.shyam.gujarat_police.repositories;
 
 import com.shyam.gujarat_police.entities.AssignPolice;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +31,11 @@ public interface AssignPoliceRepository extends PagingAndSortingRepository<Assig
 
     @Query("select count(asp) from AssignPolice asp where asp.event.id = :eventId and asp.point.id = :pointId and asp.police.designation.id = :designationId")
     Integer getPreviousAssignmentForDesignation(Long eventId, Long pointId, Long designationId);
+
+    @Transactional
+    @Modifying
+    @Query("delete from AssignPolice asp where asp.event.id = :eventId")
+    int deleteByEventId(Long eventId);
 
 //    @Query("select asp. from AssignPolice asp where asp.event.id In (:eventIds) and ")
 //    List<Long> findAvailablePoliceIds(List<Long> eventIds, List<Long> policeWithDesignationIds);

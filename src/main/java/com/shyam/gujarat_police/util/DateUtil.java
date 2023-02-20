@@ -63,6 +63,16 @@ public class DateUtil {
 
 		return null;
 	}
+	public static String dateToString(Date date, String pattern) {
+		try {
+			SimpleDateFormat dateFormat_DMY = new SimpleDateFormat(pattern);
+			return dateFormat_DMY.format(date);
+		} catch (Exception ex) {
+
+		}
+
+		return null;
+	}
 
 	public static String dateToISTString(Date date) {
 		try {

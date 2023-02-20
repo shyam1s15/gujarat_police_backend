@@ -12,7 +12,8 @@ import java.util.Optional;
 
 @Repository
 public interface PoliceRepository extends PagingAndSortingRepository<Police, Long>, PoliceBaseRepository     {
-    Optional<Police> findByBuckleNumber(String buckleNumber);
+    @Query("select p from Police p where p.buckleNumber = ?1 and p.event.id = ?2")
+    Optional<Police> getByBuckleNumberAndEventId(String buckleNumber, Long eventId);
 
     @Query("select p from Police p where p.event.id = :eventId and p.isAssigned=false and p.designation.id = :designationId")
     List<Police> getUnassignedPoliceOfDesignation(Long eventId, Long designationId);
@@ -30,4 +31,9 @@ public interface PoliceRepository extends PagingAndSortingRepository<Police, Lon
     @Modifying
     @Query("update Police p set p.isAssigned = true where p.id in (?1)")
     void updatePoliceAssignStatusAssigned(List<Long> ids);
+
+    @Transactional
+    @Modifying
+    @Query("update Police p set p.isAssigned = false where p.event.id = ?1")
+    int unAssignFromEventId(Long eventId);
 }

@@ -4,6 +4,7 @@ import com.shyam.gujarat_police.dto.request.*;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.dto.response.EventPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.entities.AssignPolice;
+import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.AssignPoliceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,11 @@ public class AssignPoliceController {
 
     @PostMapping("/police-in-event")
     public APIResponse policeByEvent(@RequestBody EventAndPointIdDto dto){
+        // when displaying the police we will automatically assign them
+        if (dto.getEventId() == null){
+            throw new DataNotFoundException("Please provide correct event");
+        }
+        assignAutomaticallyAllPoints(dto.getEventId());
         EventPoliceAssignmentRespDto resp = assignPoliceService.policeByEvent(dto);
         return APIResponse.ok(resp);
     }
@@ -85,8 +91,8 @@ public class AssignPoliceController {
         return APIResponse.ok(o);
     }
 
-    @GetMapping("assign_automatically_all_points")
-    public APIResponse assignAutomaticallyAllPoints(@RequestBody Long eventId){
+    @GetMapping("assign_automatically_all_points/{eventId}")
+    public APIResponse assignAutomaticallyAllPoints(@PathVariable("eventId") Long eventId){
         return assignPoliceService.assignAutomaticallyAllPoints(eventId);
     }
 }

@@ -1,5 +1,10 @@
 package com.shyam.gujarat_police.util;
 
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -39,5 +44,10 @@ public class FileUtils {
 
 	public static String getInvoiceFileUploadUrl(String fileName, String invoiceId, Long userId) {
 		return "invoice/" + userId + "_" + invoiceId;
+	}
+	public  static File multipartToFile(MultipartFile multipart, String fileName) throws IllegalStateException, IOException {
+		File convFile = new File(System.getProperty("java.io.tmpdir")+"/"+fileName);
+		multipart.transferTo(convFile);
+		return convFile;
 	}
 }

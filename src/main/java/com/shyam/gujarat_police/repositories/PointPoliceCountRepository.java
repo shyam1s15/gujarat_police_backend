@@ -18,4 +18,10 @@ public interface PointPoliceCountRepository extends PagingAndSortingRepository<P
 
 
     List<PointPoliceCount> findByEventId(Long eventId);
+
+    @Query("select ppc from PointPoliceCount ppc where ppc.eventId = ?1")
+    List<PointPoliceCount> getAllByEventId(Long eventId);
+
+    @Query("select ppc.pointId from PointPoliceCount ppc where ppc.eventId = ?1 group by ppc.pointId")
+    List<Long> getAllPointIdsForEvent(Long eventId);
 }
