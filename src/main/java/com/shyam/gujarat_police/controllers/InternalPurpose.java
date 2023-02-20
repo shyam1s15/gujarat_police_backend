@@ -17,4 +17,9 @@ public class InternalPurpose {
     public APIResponse deleteAssignmentsInEntireEvent(@PathVariable("eventId") Long eventId) {
         return internalPurposeService.deleteAssignmentsInEntireEvent(eventId);
     }
+
+    @GetMapping("/parth")
+    public APIResponse kuchtohDedeReBaba(){
+        return APIResponse.ok("PArth variable");
+    }
 }
