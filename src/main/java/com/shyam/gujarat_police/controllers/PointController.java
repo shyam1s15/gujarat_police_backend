@@ -46,4 +46,9 @@ public class PointController {
         pointService.deletePoint(pointId);
         return APIResponse.ok("point deleted successfully with id " + pointId);
     }
+
+    @GetMapping("/police-assigned-points/{eventId}")
+    public APIResponse getPoliceAssignedPoints(@PathVariable("eventId") Long eventId){
+        return pointService.getPoliceAssignedPoints(eventId);
+    }
 }

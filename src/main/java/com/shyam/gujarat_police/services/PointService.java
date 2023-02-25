@@ -4,7 +4,9 @@ import com.shyam.gujarat_police.dto.request.PointDto;
 import com.shyam.gujarat_police.entities.Point;
 import com.shyam.gujarat_police.entities.Zone;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
+import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.repositories.PointRepository;
+import com.shyam.gujarat_police.response.APIResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ public class PointService {
 
     @Autowired
     private ZoneService zoneService;
+
+    @Autowired
+    private AssignPoliceRepository assignPoliceRepository;
 
     public List<PointDto> getPoints() {
         List<Point> points = (List<Point>) pointRepository.findAll();
@@ -71,4 +76,22 @@ public class PointService {
         pointRepository.deleteById(pointId);
     }
 
+    public APIResponse getPoliceAssignedPoints(Long eventId) {
+        // get points grouped by point from assigned Police
+        List<Long> pointIds = assignPoliceRepository.getPointIdsEvent(eventId);
+        List<Point> points = (List<Point>) pointRepository.findAllById(pointIds);
+        List<PointDto> resp = points.stream().map(point-> {
+            PointDto dto = new PointDto();
+            dto.setId(point.getId());
+            dto.setPointName(point.getPointName());
+            dto.setZone(point.getZone().getId());
+            dto.setZoneName(point.getZone().getName());
+            dto.setDistrict(point.getDistrict());
+            dto.setTaluka(point.getTaluka());
+            dto.setAccessories(point.getAccessories());
+            dto.setRemarks(point.getRemarks());
+            return dto;
+        }).collect(Collectors.toList());
+        return APIResponse.ok(resp);
+    }
 }

@@ -44,4 +44,7 @@ public interface AssignPoliceRepository extends PagingAndSortingRepository<Assig
     // at max it can only give one police assign details
 //    @Query("select count(asp) > 0 from AssignPolice asp where asp.police.id = :pId and :dutyStartDate >= asp.event.eventEndDate and event.startDate >= :currentDate")
 //    boolean isPoliceAssignedForAanyEvents(Long pId, Date dutyStartDate, Date currentDate);
+
+    @Query("SELECT asp.point.id FROM AssignPolice asp where asp.event.id = :eventId")
+    List<Long> getPointIdsEvent(Long eventId);
 }
