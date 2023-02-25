@@ -78,6 +78,17 @@ public class AssignPoliceController {
         return APIResponse.ok(resp);
     }
 
+    @PostMapping("/police-in-event/excel")
+    public APIResponse policeInEventInExcel(@RequestBody EventAndPointIdDto dto){
+        // when displaying the police we will automatically assign them
+        if (dto.getEventId() == null){
+            throw new DataNotFoundException("Please provide correct event");
+        }
+//        assignAutomaticallyAllPoints(dto.getEventId());
+        String resp = assignPoliceService.policeByEventExcel(dto);
+        return APIResponse.ok(resp);
+    }
+
     @PostMapping("by-designation")
     public APIResponse saveAssignPoliceByDesignation(@RequestBody AssignPoliceByDesignationCountDto dto){
         List<AssignPolice> respDto = assignPoliceService.saveAssignPoliceByDesignation(dto);

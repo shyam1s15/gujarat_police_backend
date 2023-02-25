@@ -4,14 +4,22 @@ import com.shyam.gujarat_police.dto.request.*;
 import com.shyam.gujarat_police.dto.response.*;
 import com.shyam.gujarat_police.entities.*;
 import com.shyam.gujarat_police.exceptions.*;
+import com.shyam.gujarat_police.io.write.AssignedPoliceInEventWriter;
+import com.shyam.gujarat_police.io.write.ExportWriterFactory;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.util.CollectionUtil;
 import com.shyam.gujarat_police.util.DateUtil;
+import com.shyam.gujarat_police.util.FileUtils;
+import ma.glasnost.orika.MapperFacade;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -39,6 +47,13 @@ public class AssignPoliceService {
 
     @Autowired
     private PoliceRepository policeRepository;
+
+    @Autowired
+    private ModelMapper mapper;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssignPoliceService.class);
+
+
 
     public List<AssignPolice> getAllAssignedPolice() {
         return (List<AssignPolice>) assignPoliceRepository.findAll();
@@ -540,6 +555,26 @@ public class AssignPoliceService {
             );
         });
         return APIResponse.ok("new Police assigned " + newAssignedCount.get() + ", total asked " + totalRequestedPolice.get());
+    }
+
+    public String policeByEventExcel(EventAndPointIdDto dto) {
+        EventPoliceAssignmentRespDto result = policeByEvent(dto);
+        String fileName = null;
+        try {
+            fileName = FileUtils.createTempFile("xls");
+        } catch (IOException e1) {
+            return null;
+        }
+        AssignedPoliceInEventWriter writer = (AssignedPoliceInEventWriter) new ExportWriterFactory<PointPoliceAssignmentRespDto>()
+                .getExportFile(ExportWriterFactory.ASSIGNED_POLICE_EXPORT, fileName, mapper);
+        LOGGER.info("export_assigned_police_started");
+        writer.setAssignments(result.getPointAssignments());
+//        writer.exportToExcel(writer.getAssignments().get(0).getAssignedPoliceList());
+        writer.exportToExcel(result.getPointAssignments());
+        if (writer != null) {
+            writer.close();
+        }
+        return fileName;
     }
 
 //    public E
