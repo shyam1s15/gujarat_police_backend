@@ -400,4 +400,18 @@ public class DateUtil {
     public static boolean IsEqualDates(Date expDate, Date edd) {
 		return DateTimeComparator.getDateOnlyInstance().compare(expDate, edd) == 0;
     }
+
+	public static boolean isDateBeforeOrEqual(Date startDate, Date endDate) {
+		return startDate.before(endDate) || sameDay(startDate, endDate);
+	}
+
+	public static boolean isDateAfterOrEqual(Date startDate, Date endDate) {
+		return startDate.after(endDate) || sameDay(startDate, endDate);
+	}
+
+
+	public static boolean sameDay(Date d1, Date d2){
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+		return fmt.format(d1).equals(fmt.format(d2));
+	}
 }

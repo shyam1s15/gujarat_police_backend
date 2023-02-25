@@ -441,9 +441,9 @@ public class AssignPoliceService {
                 assignPolice.setDutyStartDate(dto.getDutyStartDate());
                 assignPolice.setDutyEndDate(dto.getDutyEndDate());
 
-                // check if duty dates is in range of event date.
-                if (!(event.getEventStartDate().before(assignPolice.getDutyStartDate()) && event.getEventEndDate().after(assignPolice.getDutyEndDate()))) {
-                    throw new DateMisMatchException("Date is not in range of event date : " + event.getEventStartDate() + " : " + event.getEventEndDate() + " police assignment dates : " + assignPolice.getDutyStartDate() + " " + assignPolice.getDutyEndDate());
+
+                if ((!DateUtil.isDateBeforeOrEqual(event.getEventStartDate(), assignPolice.getDutyStartDate())) || (!DateUtil.isDateAfterOrEqual(event.getEventEndDate(), assignPolice.getDutyEndDate()))) {
+                    throw new DateMisMatchException("Date is not in range of event date : " + DateUtil.dateToString(event.getEventStartDate(),"dd-MM-YYYY") + " : " + DateUtil.dateToString(event.getEventEndDate(), "dd-MM-YYYY") + " police assignment dates : " + DateUtil.dateToString(assignPolice.getDutyStartDate(), "dd-MM-yyyy") + " " + DateUtil.dateToString(assignPolice.getDutyEndDate(), "dd-MM-YYYY"));
                 }
 
                 assignPolice.setPolice(police);
