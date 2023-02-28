@@ -17,6 +17,9 @@ public class EventPoliceAssignmentRespDto {
     @JsonProperty("event-id")
     private Long eventId;
 
+    @JsonProperty("filename")
+    private String fileName;
+
     @JsonProperty("point-assignments")
     private List<PointPoliceAssignmentRespDto> pointAssignments;
 }

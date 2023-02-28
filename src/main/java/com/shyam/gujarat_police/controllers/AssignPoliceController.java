@@ -75,6 +75,8 @@ public class AssignPoliceController {
         }
         assignAutomaticallyAllPoints(dto.getEventId());
         EventPoliceAssignmentRespDto resp = assignPoliceService.policeByEvent(dto);
+        String filename = assignPoliceService.policeByEventExcel(resp);
+        resp.setFileName(filename);
         return APIResponse.ok(resp);
     }
 

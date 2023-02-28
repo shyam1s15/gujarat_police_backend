@@ -577,5 +577,23 @@ public class AssignPoliceService {
         return fileName;
     }
 
-//    public E
+    public String policeByEventExcel(EventPoliceAssignmentRespDto result) {
+        String fileName = null;
+        try {
+            fileName = FileUtils.createTempFile("xls");
+        } catch (IOException e1) {
+            return null;
+        }
+        AssignedPoliceInEventWriter writer = (AssignedPoliceInEventWriter) new ExportWriterFactory<PointPoliceAssignmentRespDto>()
+                .getExportFile(ExportWriterFactory.ASSIGNED_POLICE_EXPORT, fileName, mapper);
+        LOGGER.info("export_assigned_police_started");
+        writer.setAssignments(result.getPointAssignments());
+//        writer.exportToExcel(writer.getAssignments().get(0).getAssignedPoliceList());
+        writer.exportToExcel(result.getPointAssignments());
+        if (writer != null) {
+            writer.close();
+        }
+        return fileName;
+    }
+
 }
