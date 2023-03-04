@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -236,6 +237,7 @@ public class EventPoliceCountService {
     public List<EventAssignmentByDesignationCountsDto> getPoliceCountInEventByDesignation(Long eventId) {
         List<Designation> allDesignations = designationService.getAllDesignations();
         return allDesignations.stream().map(designation -> {
+            Optional<EventPoliceCount> optAskedCount = eventPoliceCountRespository.getByEventIdAndDesignationId(eventId, designation.getId());
             EventAssignmentByDesignationCountsDto dto = new EventAssignmentByDesignationCountsDto();
             AtomicInteger assignedPoliceCount = new AtomicInteger();
             AtomicInteger totalPoliceCount = new AtomicInteger();
@@ -249,6 +251,7 @@ public class EventPoliceCountService {
             dto.setTotalPoliceCount(totalPoliceCount.get());
             dto.setName(designation.getName());
             dto.setNameInGujarati(designation.getNameInGujarati());
+            optAskedCount.ifPresent(eventPoliceCount -> dto.setTotalAskedCount(eventPoliceCount.getDesignationCount() == null ? 0 : eventPoliceCount.getDesignationCount()));
             return dto;
         }).collect(Collectors.toList());
     }

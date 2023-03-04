@@ -6,6 +6,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EventPoliceCountRepository extends PagingAndSortingRepository<EventPoliceCount, Long>,  EventPoliceCountBaseRepository{
@@ -15,4 +16,7 @@ public interface EventPoliceCountRepository extends PagingAndSortingRepository<E
 
     @Query("select epc.event.id from EventPoliceCount as epc group by epc.event.id")
     List<Long> getAllEventIds();
+
+    @Query("select epc from EventPoliceCount as epc where epc.event.id = ?1 and epc.designationId = ?2")
+    Optional<EventPoliceCount> getByEventIdAndDesignationId(Long eventId, Long id);
 }

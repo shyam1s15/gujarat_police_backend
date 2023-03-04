@@ -28,4 +28,7 @@ public class EventAssignmentByDesignationCountsDto {
 
     @JsonProperty("total-police-count")
     private int totalPoliceCount = 0;
+
+    @JsonProperty("total-asked-count")
+    private int totalAskedCount = 0;
 }
