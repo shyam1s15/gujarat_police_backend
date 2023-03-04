@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component("police_import_processor")
 @Primary
@@ -52,10 +53,15 @@ public class PoliceImportProcessor implements ExcelReadProcessor<Sheet> {
                         firstRow = false;
                         header = ImportUtil.columnNameColumnIndex(row);
                         List<String> list = ImportUtil.verifyHeader(header, PoliceImportExcelDto.PoliceImportExcelDtoTemplate.list());
+
+                        if (list != null && list.size() > 0) {
+                            obj.getErrorList().add("Header column missing" +list.stream().map(Object::toString).collect(Collectors.joining(", ")));
+                            return obj;
+                        }
                     } else {
                         PoliceImportExcelDto policeImport = new PoliceImportExcelDto(header, row, rowNumber);
                         if (!policeImport.isPoliceValid()){
-                            errorMap.put(rowNumber, "row Number::" + rowNumber + " :: " + "Invalid police information at perticular row");
+                            errorMap.put(rowNumber, "row Number::" + rowNumber + " :: " + "Invalid police information at perticular row" + policeImport.getErrorRowDetail().toString());
                         } else {
                             APIResponse resp = policeService.savePoliceFromExcel(policeImport, event);
                             if (resp.getResponse() != null && resp.getResponse().getError() != 0) {

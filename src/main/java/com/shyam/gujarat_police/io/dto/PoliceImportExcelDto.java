@@ -29,6 +29,28 @@ public class PoliceImportExcelDto {
     private String policeStationName;
     private String district;
     private String gender;
+
+    private StringBuilder errorRowDetail;
+
+    @Override
+    public String toString() {
+        return "PoliceImportExcelDto{" +
+                "row=" + row +
+                ", rowNumber=" + rowNumber +
+                ", header=" + header +
+                ", serialNo='" + serialNo + '\'' +
+                ", designation='" + designation + '\'' +
+                ", officerName='" + officerName + '\'' +
+                ", buckleNo='" + buckleNo + '\'' +
+                ", mobileNumber='" + mobileNumber + '\'' +
+                ", policeStationName='" + policeStationName + '\'' +
+                ", district='" + district + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age='" + age + '\'' +
+                ", isPoliceValid=" + isPoliceValid +
+                '}';
+    }
+
     private String age;
 
     private boolean isPoliceValid = true;
@@ -66,10 +88,25 @@ public class PoliceImportExcelDto {
         gender = TextUtils.notBlankNotEmptyWithDefault(getValue(PoliceImportExcelDtoTemplate.Gender), "-");
         age = TextUtils.notBlankNotEmptyWithDefault(getValue(PoliceImportExcelDtoTemplate.Age), "0");
 
-        if (!TextUtils.notBlankNotEmpty(serialNo) || !TextUtils.notBlankNotEmpty(designation) || !TextUtils.notBlankNotEmpty(designation)
-        || !TextUtils.notBlankNotEmpty(officerName) || !TextUtils.notBlankNotEmpty(buckleNo) || !TextUtils.notBlankNotEmpty(mobileNumber) || !TextUtils.notBlankNotEmpty(policeStationName)){
+        if (TextUtils.isBlank(serialNo) || TextUtils.isBlank(designation)
+                || TextUtils.isBlank(officerName) || TextUtils.isBlank(buckleNo)
+                || TextUtils.isBlank(mobileNumber) || TextUtils.isBlank(policeStationName)){
             isPoliceValid = false;
+            if (TextUtils.isBlank(serialNo)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Serial_NO).append(", ");
+            if (TextUtils.isBlank(designation)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Designation).append(", ");
+            if (TextUtils.isBlank(officerName)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Name).append(", ");
+            if (TextUtils.isBlank(buckleNo)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Buckle_No).append(", ");
+            if (TextUtils.isBlank(mobileNumber)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Mobile_Number).append(", ");
+            System.out.println(this.toString());
         }
+    }
+
+    public StringBuilder getErrorRowDetail() {
+        return errorRowDetail;
+    }
+
+    public void setErrorRowDetail(StringBuilder errorRowDetail) {
+        this.errorRowDetail = errorRowDetail;
     }
 
     public enum PoliceImportExcelDtoTemplate {
