@@ -5,11 +5,23 @@ import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
+import com.shyam.gujarat_police.io.ExcelDataObject;
+import com.shyam.gujarat_police.io.XlsReader;
+import com.shyam.gujarat_police.io.dto.PoliceStationImportExcelDto;
+import com.shyam.gujarat_police.io.processor.PoliceImportProcessor;
+import com.shyam.gujarat_police.io.read.ExcelReadProcessor;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.repositories.PoliceStationRepository;
+import com.shyam.gujarat_police.response.APIResponse;
+import com.shyam.gujarat_police.util.ImportUtil;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +33,15 @@ public class PoliceStationService {
 
     @Autowired
     private PoliceRepository policeRepository;
+
+
+    @Autowired
+    @Qualifier("police_station_import_processor")
+    private ExcelReadProcessor<Sheet> policeStationImportProcessor;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoliceStationService.class);
+
+
     public List<PoliceStation> getAllPoliceStation() {
         return (List<PoliceStation>) policeStationRepository.findAll();
     }
@@ -83,8 +104,7 @@ public class PoliceStationService {
     }
 
     private boolean isUniqueName(String nameInGujarati, String nameInEnglish){
-        Optional<PoliceStation> isPoliceStationExists = policeStationRepository.findByNameInGujaratiOrEnglish(nameInEnglish, nameInGujarati);
-        return isPoliceStationExists.isEmpty();
+        return policeStationRepository.findByNameInGujaratiOrEnglish(nameInEnglish, nameInGujarati).size() == 0;
     }
 
     public int saveMultiple(List<PoliceStation> policeStations){
@@ -103,5 +123,33 @@ public class PoliceStationService {
 
     public List<DistrictTalukaAndPoliceStationNameRespDto> getDistrictTalukaAndPoliceStation() {
         return policeStationRepository.getDistrictTalukaAndPoliceStation();
+    }
+
+    public APIResponse savePoliceStationFromExcel(PoliceStationImportExcelDto dto) {
+        LOGGER.info("savePoliceStationFromExcel");
+        if(isUniqueName(dto.getPostNameInGuj(), dto.getPostName())){
+            PoliceStation policeStation = new PoliceStation();
+            policeStation.setPoliceStationName(dto.getPostName());
+            policeStation.setPoliceStationNameInGujarati(dto.getPostNameInGuj());
+            policeStation.setDistrict(dto.getCity());
+            policeStation.setDistrictInGuj(dto.getCityInGuj());
+            policeStation.setTaluko(dto.getTaluko());
+            policeStation.setTalukoInGuj(dto.getTalukoInGuj());
+            policeStation.setAddress(dto.getAddress());
+            policeStation.setContactNumber(dto.getContactNumber());
+
+            policeStationRepository.save(policeStation);
+            System.out.println(dto.getSerialNo());
+            return APIResponse.ok();
+        }
+        return APIResponse.error("Already exists station " + dto.getPostName());
+    }
+
+    public APIResponse uploadFromExcel(File file) {
+        XlsReader reader = new XlsReader(policeStationImportProcessor);
+        ExcelDataObject data = reader.read(file, null);
+        String fileName = ImportUtil.createOrderUpdateErrorFile(data);
+        LOGGER.error("Upload_police_station_from_excel completed::success" + data.getSuccessCount() + ":failure::" + data.getFailureCount());
+        return APIResponse.ok(fileName);
     }
 }

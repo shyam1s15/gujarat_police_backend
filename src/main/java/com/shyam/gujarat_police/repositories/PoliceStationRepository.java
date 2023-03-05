@@ -14,7 +14,7 @@ public interface PoliceStationRepository extends JpaRepository<PoliceStation, Lo
     Optional<PoliceStation> findByPoliceStationName(String stationName);
 
     @Query("select station from PoliceStation station where station.policeStationName like ?1 or station.policeStationNameInGujarati like ?2")
-    Optional<PoliceStation> findByNameInGujaratiOrEnglish(String nameInEnglish, String nameInGujarati);
+    List<PoliceStation> findByNameInGujaratiOrEnglish(String nameInEnglish, String nameInGujarati);
 
 //    @Query("select new com.smytten.order.dto.ProductRatingDto(count(id), round(ratingNumber), count(comment) as c) from OrderFeedback where productId = ?1 and ratingNumber > 0 and orderType = 'trial' group by round(ratingNumber) order by 2")
 

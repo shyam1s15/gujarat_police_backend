@@ -97,7 +97,7 @@ public class PoliceImportExcelDto {
             if (TextUtils.isBlank(officerName)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Name).append(", ");
             if (TextUtils.isBlank(buckleNo)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Buckle_No).append(", ");
             if (TextUtils.isBlank(mobileNumber)) errorRowDetail.append(PoliceImportExcelDtoTemplate.Mobile_Number).append(", ");
-            System.out.println(this.toString());
+
         }
     }
 

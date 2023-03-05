@@ -48,6 +48,21 @@ public class PoliceStation extends BaseModel {
     @NotEmpty(message = "{validation.name.NotEmpty}")
     private String policeStationNameInGujarati;
 
+    @Override
+    public String toString() {
+        return "PoliceStation{" +
+                "id=" + id +
+                ", district='" + district + '\'' +
+                ", districtInGuj='" + districtInGuj + '\'' +
+                ", taluko='" + taluko + '\'' +
+                ", talukoInGuj='" + talukoInGuj + '\'' +
+                ", contactNumber='" + contactNumber + '\'' +
+                ", address='" + address + '\'' +
+                ", policeStationName='" + policeStationName + '\'' +
+                ", policeStationNameInGujarati='" + policeStationNameInGujarati + '\'' +
+                '}';
+    }
+
     @OneToOne
     @JoinColumn(name="headPolice_id")
     private Police headPolice;

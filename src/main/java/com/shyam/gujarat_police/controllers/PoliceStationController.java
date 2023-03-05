@@ -6,11 +6,13 @@ import com.shyam.gujarat_police.helper.ExcelHelper;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.ExcelService;
 import com.shyam.gujarat_police.services.PoliceStationService;
+import com.shyam.gujarat_police.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -56,17 +58,27 @@ public class PoliceStationController {
     }
 //JPZKvQGHuhJyGxE+6gU+/lncJMDIKl8W6VW5GlQe
     @PostMapping("/upload-from-excel")
-    public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile file) throws IOException {
+    public APIResponse uploadFromExcel(@RequestParam("file") MultipartFile multiPartFile) throws IOException {
         String message = "";
 
-        if (ExcelHelper.hasExcelFormat(file)){
-            int totalPoliceStationInserted = excelService.savePoliceStationFromExcel(file);
-            message = "Police station Uploaded from Excel successfully " + totalPoliceStationInserted;
-//            return ResponseEntity.ok(message);
-            return APIResponse.ok(message);
+//        if (ExcelHelper.hasExcelFormat(file)){
+//            int totalPoliceStationInserted = excelService.savePoliceStationFromExcel(file);
+//            message = "Police station Uploaded from Excel successfully " + totalPoliceStationInserted;
+////            return ResponseEntity.ok(message);
+//            return APIResponse.ok(message);
+//        }
+////        return ResponseEntity.ok("Something went wrong");
+//        return APIResponse.error(message);
+        if (!multiPartFile.isEmpty()) {
+            File file = FileUtils.multipartToFile(multiPartFile, multiPartFile.getName());
+            return policeStationService.uploadFromExcel(file);
         }
-//        return ResponseEntity.ok("Something went wrong");
-        return APIResponse.error(message);
+//            if (ExcelHelper.hasExcelFormat(file)){
+//            int totalPoliceInserted = excelService.savePoliceFromExcel(file, eventId);
+//            message = "Police Uploaded from Excel successfully " + totalPoliceInserted;
+//            return APIResponse.ok(message);
+//        }
+        return APIResponse.error("Something went wrong");
     }
 
     @GetMapping("/district-taluka-station")
