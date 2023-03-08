@@ -366,7 +366,7 @@ public class AssignPoliceService {
         int requiredCount = designationCount.getDesignationCount()-previousAssignment;
         List<Police> unassignedPoliceOfDesignation = policeService.getUnassignedPoliceOfDesignation(dto.getEventId(),designationCount.getDesignationId());
         // if required police are more then throw error
-        if(requiredCount > unassignedPoliceOfDesignation.size()){
+        if( requiredCount > unassignedPoliceOfDesignation.size()){
             // returning null when autoassignment operation running. as want to assign best case.
             if (isAutoAssignment){return null;}
             throw new InsufficientDataException("Unavailable police with designation " + designationCount.getDesignationName() + " count " + designationCount.getDesignationCount() + " only available are " + unassignedPoliceOfDesignation.size());
