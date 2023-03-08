@@ -486,7 +486,7 @@ public class AssignPoliceService {
         allPoints.stream().forEach(point -> {
             PointPoliceAssignmentRespDto pointAssignment = new PointPoliceAssignmentRespDto();
             List<AssignPolice> assignments = assignPoliceRepository.assignedPoliceByEventAndPoint(dto.getEventId(), point.getId());
-            System.out.println(assignments.size());
+//            System.out.println(assignments.size());
             if (assignments.size() > 0){
                 List<PoliceInPointAndEventDto> assignedPoliceForce = assignments.stream().map( assignment -> {
                     PoliceInPointAndEventDto police = new PoliceInPointAndEventDto();
