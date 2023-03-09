@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.DesignationDto;
 import com.shyam.gujarat_police.dto.request.DesignationListDto;
 import com.shyam.gujarat_police.dto.request.FindByDesignationDto;
 import com.shyam.gujarat_police.entities.Designation;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DesignationService {
@@ -21,9 +23,16 @@ public class DesignationService {
     @Autowired
     private DesignationRepository designationRepository;
 
-    public List<Designation> getAllDesignations() {
-        return (List<Designation>) designationRepository.findAll();
-
+    public List<DesignationDto> getAllDesignations() {
+        List <Designation> designationList = (List<Designation>) designationRepository.findAll();
+        return designationList.stream().map(designation -> {
+            DesignationDto dto = new DesignationDto();
+            dto.setId(designation.getId());
+            dto.setName(designation.getName());
+            dto.setNameInGujarati(designation.getNameInGujarati());
+            dto.setDeletable(designation.getPolice().size() == 0);
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     public Designation saveDesignation(Designation designation) {

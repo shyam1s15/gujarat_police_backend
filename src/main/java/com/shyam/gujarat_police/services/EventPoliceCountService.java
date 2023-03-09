@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.DesignationDto;
 import com.shyam.gujarat_police.dto.request.EventIdAndSearchKeyWordDto;
 import com.shyam.gujarat_police.dto.request.EventPoliceCountDto;
 import com.shyam.gujarat_police.dto.request.PoliceIdNameDesigNumDto;
@@ -235,7 +236,7 @@ public class EventPoliceCountService {
         }).collect(Collectors.toList());
     }
     public List<EventAssignmentByDesignationCountsDto> getPoliceCountInEventByDesignation(Long eventId) {
-        List<Designation> allDesignations = designationService.getAllDesignations();
+        List<DesignationDto> allDesignations = designationService.getAllDesignations();
         return allDesignations.stream().map(designation -> {
             Optional<EventPoliceCount> optAskedCount = eventPoliceCountRespository.getByEventIdAndDesignationId(eventId, designation.getId());
             EventAssignmentByDesignationCountsDto dto = new EventAssignmentByDesignationCountsDto();
