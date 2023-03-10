@@ -43,7 +43,7 @@ public class DesignationService {
         }
     }
 
-    public Designation updateDesignation(FindByDesignationDto designation, Long designationId) {
+    public Designation updateDesignation(DesignationDto designation, Long designationId) {
         if (!Objects.nonNull(designationId)) {
             throw new DataNotFoundException("Designation Id not found: " + designationId);
         }
@@ -52,12 +52,18 @@ public class DesignationService {
             throw new DataNotFoundException("Designation not found: " + designationId);
         } else {
             Designation obtainedDesignation = designationOptional.get();
-            if (TextUtils.notBlankNotEmpty(designation.getName())) {
-                obtainedDesignation.setName(designation.getName());
+            // if any other name in english exists
+            // if any other name in gujarati exists
+            Optional<Designation> otherSameDesi = designationRepository.getWhereNotIdAndByNameOrNameInGuj(designationId, designation.getName(), designation.getNameInGujarati());
+            if (otherSameDesi.isPresent()) {
+                return null;
             }
-            if (TextUtils.notBlankNotEmpty(designation.getNameInGujarati())) {
-                obtainedDesignation.setNameInGujarati(designation.getNameInGujarati());
+            if (TextUtils.isBlank(designation.getName()) || TextUtils.isBlank(designation.getNameInGujarati())) {
+                return null;
             }
+            obtainedDesignation.setName(designation.getName());
+            obtainedDesignation.setNameInGujarati(designation.getNameInGujarati());
+
             return designationRepository.save(obtainedDesignation);
         }
     }

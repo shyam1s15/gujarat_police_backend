@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.controllers;
 
+import com.shyam.gujarat_police.dto.request.DesignationDto;
 import com.shyam.gujarat_police.dto.request.DesignationListDto;
 import com.shyam.gujarat_police.dto.request.FindByDesignationDto;
 import com.shyam.gujarat_police.entities.Designation;
@@ -37,10 +38,13 @@ public class DesignationController {
     }
 
     @PutMapping("/{designationId}")
-    public APIResponse updateDesignation(@RequestBody FindByDesignationDto designation,
+    public APIResponse updateDesignation(@RequestBody DesignationDto designation,
             @PathVariable("designationId") Long designationId){
         Designation dto = designationService.updateDesignation(designation, designationId);
-        return APIResponse.ok(dto);
+        if (dto != null) {
+            return APIResponse.ok(dto);
+        }
+        return APIResponse.error("Designation already exists");
     }
 
     @GetMapping("/{designationId}")
