@@ -3,6 +3,7 @@ package com.shyam.gujarat_police.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.dto.request.CreatePoliceDto;
+import com.shyam.gujarat_police.dto.request.PoliceDto;
 import com.shyam.gujarat_police.entities.Designation;
 import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Police;
@@ -13,6 +14,7 @@ import com.shyam.gujarat_police.io.ExcelDataObject;
 import com.shyam.gujarat_police.io.XlsReader;
 import com.shyam.gujarat_police.io.dto.PoliceImportExcelDto;
 import com.shyam.gujarat_police.io.read.ExcelReadProcessor;
+import com.shyam.gujarat_police.repositories.DesignationRepository;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.util.ImportUtil;
@@ -29,6 +31,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PoliceService {
@@ -101,11 +104,12 @@ public class PoliceService {
         policeRepository.deleteById(id);
     }
 
-    public Police updatePolice(Police police, Long policeId) {
+    public Police updatePolice(PoliceDto police, Long policeId) {
         if (Objects.isNull(policeId)){
             throw new DataNotFoundException("Police Id not found with id " + policeId);
         }
         Optional<Police> optionalPolice = policeRepository.findById(policeId);
+        Designation designation = designationService.getDesignationByNameOrNameInGujarati(police.getDesignationName());
         if (optionalPolice.isEmpty()) {
             throw new DataNotFoundException("Police not found with id " + policeId);
         } else {
@@ -116,9 +120,9 @@ public class PoliceService {
             obtainedPolice.setAge(police.getAge());
             obtainedPolice.setDistrict(police.getDistrict());
             obtainedPolice.setGender(police.getGender());
-            obtainedPolice.setDesignation(police.getDesignation());
-            obtainedPolice.setPoliceStation(police.getPoliceStation());
-            obtainedPolice.setEvent(police.getEvent());
+            obtainedPolice.setDesignation(designation);
+//            obtainedPolice.setPoliceStation(police.getPoliceStation());
+//            obtainedPolice.setEvent(police.getEvent());
             return policeRepository.save(obtainedPolice);
         }
     }
@@ -212,5 +216,23 @@ public class PoliceService {
         String fileName = ImportUtil.createOrderUpdateErrorFile(data);
         LOGGER.error("Upload_police_from_excel completed::success" + data.getSuccessCount() + ":failure::" + data.getFailureCount());
         return APIResponse.ok(fileName);
+    }
+
+    public List<PoliceDto> getAllPoliceInEvent(Long eventId) {
+         List<Police> policeListInEvent = policeRepository.getByEventId(eventId);
+         return policeListInEvent.stream().map(p->{
+             PoliceDto dto = new PoliceDto();
+             dto.setId(p.getId());
+             dto.setFullName(p.getFullName());
+             dto.setBuckleNumber(p.getBuckleNumber());
+             dto.setNumber(p.getNumber());
+             dto.setAge(p.getAge());
+             dto.setDistrict(p.getDistrict());
+             dto.setGender(p.getGender());
+             dto.setPoliceStationName(p.getPoliceStation().getPoliceStationName());
+             dto.setDesignationName(p.getDesignation().getName());
+             dto.setAssigned(p.isAssigned());
+             return dto;
+         }).collect(Collectors.toList());
     }
 }

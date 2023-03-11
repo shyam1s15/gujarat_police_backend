@@ -2,11 +2,14 @@ package com.shyam.gujarat_police.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shyam.gujarat_police.dto.request.CreatePoliceDto;
+import com.shyam.gujarat_police.dto.request.PoliceDto;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.ExcelService;
 import com.shyam.gujarat_police.services.PoliceService;
 import com.shyam.gujarat_police.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,10 +31,19 @@ public class PoliceController {
     @Autowired
     private ExcelService excelService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoliceController.class);
+
+
     @GetMapping("/")
     public APIResponse getAllPolice(){
         return APIResponse.ok(policeService.getAllPolice());
     }
+
+    @GetMapping("/police-in-event/{id}")
+    public APIResponse getAllPoliceInEvent(@NotNull @PathVariable Long id){
+        return APIResponse.ok(policeService.getAllPoliceInEvent(id));
+    }
+
 
     @PostMapping("/")
     public APIResponse savePolice(@RequestBody CreatePoliceDto police){
@@ -41,13 +53,15 @@ public class PoliceController {
 
     @DeleteMapping("/{id}")
     public APIResponse deletePolice(@NotNull @PathVariable Long id){
+        LOGGER.info("Delete " + id);
         policeService.deletePolice(id);
         return APIResponse.ok("Police was successfully deleted");
     }
 
     @PutMapping("/{policeId}")
-    public APIResponse updatePolice(@RequestBody @Valid @NotNull @NotBlank Police police,
+    public APIResponse updatePolice(@RequestBody @Valid @NotNull @NotBlank PoliceDto police,
                                @PathVariable("policeId") Long policeId){
+
         Police updatedPolice = policeService.updatePolice(police, policeId);
         return APIResponse.ok(updatedPolice);
     }

@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.repositories.impl;
 
+import com.shyam.gujarat_police.dto.request.PoliceDto;
 import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.repositories.BaseRepository;
 import com.shyam.gujarat_police.repositories.PoliceBaseRepository;
