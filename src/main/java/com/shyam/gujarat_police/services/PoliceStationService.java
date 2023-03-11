@@ -5,6 +5,7 @@ import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
+import com.shyam.gujarat_police.exceptions.ExcelException;
 import com.shyam.gujarat_police.io.ExcelDataObject;
 import com.shyam.gujarat_police.io.XlsReader;
 import com.shyam.gujarat_police.io.dto.PoliceStationImportExcelDto;
@@ -13,6 +14,7 @@ import com.shyam.gujarat_police.io.read.ExcelReadProcessor;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.repositories.PoliceStationRepository;
 import com.shyam.gujarat_police.response.APIResponse;
+import com.shyam.gujarat_police.util.FileUtils;
 import com.shyam.gujarat_police.util.ImportUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
@@ -20,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -151,5 +155,18 @@ public class PoliceStationService {
         String fileName = ImportUtil.createOrderUpdateErrorFile(data);
         LOGGER.error("Upload_police_station_from_excel completed::success" + data.getSuccessCount() + ":failure::" + data.getFailureCount());
         return APIResponse.ok(fileName);
+    }
+
+    public String downloadSamplePoliceStationExcel() {
+        File policeDemoFile = null;
+        File tmpFile = null;
+        try {
+            tmpFile = FileUtils.createAndGetTempFile("xlsx");
+            policeDemoFile = ResourceUtils.getFile("classpath:files/police_station_demo.xlsx");
+            FileUtils.copyExcelFile(policeDemoFile.getAbsolutePath(), tmpFile.getAbsolutePath());
+        } catch (IOException e) {
+            throw new ExcelException("Excel could not be downloaded");
+        }
+        return tmpFile.getAbsolutePath();
     }
 }

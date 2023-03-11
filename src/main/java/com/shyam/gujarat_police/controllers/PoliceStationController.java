@@ -7,6 +7,8 @@ import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.services.ExcelService;
 import com.shyam.gujarat_police.services.PoliceStationService;
 import com.shyam.gujarat_police.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,9 @@ public class PoliceStationController {
 
     @Autowired
     private ExcelService excelService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoliceStationController.class);
+
 
     @GetMapping("/")
     public APIResponse getAllPoliceStation(){
@@ -87,4 +92,9 @@ public class PoliceStationController {
         return APIResponse.ok(dto);
     }
 
+    @GetMapping("/download-sample-station-excel")
+    public APIResponse downloadSamplePoliceExcel() {
+        LOGGER.info("downloadSamplePoliceExcel");
+        return APIResponse.ok(policeStationService.downloadSamplePoliceStationExcel());
+    }
 }

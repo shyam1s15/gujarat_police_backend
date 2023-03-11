@@ -258,7 +258,6 @@ public class PoliceService {
     }
 
     public String downloadSamplePoliceExcel() {
-        String filename = null;
         File policeDemoFile = null;
         File tmpFile = null;
         try {
