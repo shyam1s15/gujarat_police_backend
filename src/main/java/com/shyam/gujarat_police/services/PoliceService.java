@@ -14,12 +14,12 @@ import com.shyam.gujarat_police.io.ExcelDataObject;
 import com.shyam.gujarat_police.io.XlsReader;
 import com.shyam.gujarat_police.io.dto.PoliceImportExcelDto;
 import com.shyam.gujarat_police.io.read.ExcelReadProcessor;
-import com.shyam.gujarat_police.repositories.DesignationRepository;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.response.APIResponse;
 import com.shyam.gujarat_police.util.ImportUtil;
 import com.shyam.gujarat_police.util.ObjectUtil;
 import com.shyam.gujarat_police.util.RegExUtil;
+import com.shyam.gujarat_police.util.TextUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,25 +36,18 @@ import java.util.stream.Collectors;
 @Service
 public class PoliceService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoliceService.class);
     @Autowired
     private PoliceRepository policeRepository;
-
     @Autowired
     private DesignationService designationService;
-
     @Autowired
     private PoliceStationService policeStationService;
-
     @Autowired
     private EventService eventService;
-
-
     @Autowired
     @Qualifier("police_import_processor")
     private ExcelReadProcessor<Sheet> policeImportProcessor;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PoliceService.class);
-
 
     public List<Police> getAllPolice() {
         return (List<Police>) policeRepository.findAll();
@@ -62,7 +55,7 @@ public class PoliceService {
 
     public Police savePolice(CreatePoliceDto dto) {
         // unique buckle number && designation exists? && policeStation exists?
-        if (isUniqueBuckleNumberInEvent(dto.getBuckleNumber(), dto.getEventId())){
+        if (isUniqueBuckleNumberInEvent(dto.getBuckleNumber(), dto.getEventId())) {
             Police police = createPoliceFromDto(dto);
             return policeRepository.save(police);
         } else {
@@ -72,8 +65,8 @@ public class PoliceService {
     }
 
     // create new method to save police
-    public APIResponse savePoliceForExcel(CreatePoliceDto dto){
-        if (isUniqueBuckleNumberInEvent(dto.getBuckleNumber(), dto.getEventId())){
+    public APIResponse savePoliceForExcel(CreatePoliceDto dto) {
+        if (isUniqueBuckleNumberInEvent(dto.getBuckleNumber(), dto.getEventId())) {
             Police police = createPoliceFromDto(dto);
             policeRepository.save(police);
             return APIResponse.ok();
@@ -105,21 +98,42 @@ public class PoliceService {
     }
 
     public Police updatePolice(PoliceDto police, Long policeId) {
-        if (Objects.isNull(policeId)){
+        if (Objects.isNull(policeId)) {
             throw new DataNotFoundException("Police Id not found with id " + policeId);
         }
         Optional<Police> optionalPolice = policeRepository.findById(policeId);
+        if (TextUtils.isBlank(police.getDesignationName()))
+            throw new DataNotFoundException("Designation cannot be empty");
         Designation designation = designationService.getDesignationByNameOrNameInGujarati(police.getDesignationName());
         if (optionalPolice.isEmpty()) {
             throw new DataNotFoundException("Police not found with id " + policeId);
         } else {
             Police obtainedPolice = optionalPolice.get();
-            obtainedPolice.setFullName(police.getFullName());
-            obtainedPolice.setBuckleNumber(police.getBuckleNumber());
-            obtainedPolice.setNumber(police.getNumber());
-            obtainedPolice.setAge(police.getAge());
-            obtainedPolice.setDistrict(police.getDistrict());
-            obtainedPolice.setGender(police.getGender());
+            if (!TextUtils.isBlank(police.getFullName())) {
+                obtainedPolice.setFullName(police.getFullName());
+            }
+            if (!TextUtils.isBlank(police.getBuckleNumber())) {
+
+                obtainedPolice.setBuckleNumber(police.getBuckleNumber());
+            }
+
+            if (!TextUtils.isBlank(police.getNumber())) {
+                obtainedPolice.setNumber(police.getNumber());
+            }
+
+            if (!RegExUtil.isNumber(police.getAge())) {
+                obtainedPolice.setAge(police.getAge());
+            }
+
+            if (!TextUtils.isBlank(police.getDistrict())) {
+                obtainedPolice.setDistrict(police.getDistrict());
+            }
+
+            if (!TextUtils.isBlank(police.getGender())) {
+                obtainedPolice.setGender(police.getGender());
+            }
+
+
             obtainedPolice.setDesignation(designation);
 //            obtainedPolice.setPoliceStation(police.getPoliceStation());
 //            obtainedPolice.setEvent(police.getEvent());
@@ -129,15 +143,15 @@ public class PoliceService {
 
     public Police readSpecific(Long policeId) {
         return policeRepository.findById(policeId)
-                .orElseThrow(()->new DataNotFoundException("Police not found with id: " + policeId));
+                .orElseThrow(() -> new DataNotFoundException("Police not found with id: " + policeId));
     }
 
     public APIResponse officerData() throws JsonProcessingException {
         List<Police> policeList = (List<Police>) policeRepository.findAll();
-        return APIResponse.ok( policeList );
+        return APIResponse.ok(policeList);
     }
 
-    private boolean isUniqueBuckleNumberInEvent(String buckleNumber, Long eventId){
+    private boolean isUniqueBuckleNumberInEvent(String buckleNumber, Long eventId) {
         Optional<Police> isPoliceExists = policeRepository.getByBuckleNumberAndEventId(buckleNumber, eventId);
         return isPoliceExists.isEmpty();
     }
@@ -149,7 +163,7 @@ public class PoliceService {
         return uniquePolice.size();
     }
 
-    private boolean isPoliceExists(Police station){
+    private boolean isPoliceExists(Police station) {
         return policeRepository.isPoliceExists(station);
     }
 
@@ -177,10 +191,10 @@ public class PoliceService {
     }
 
     public APIResponse savePoliceFromExcel(PoliceImportExcelDto policeImport, Event event) {
-        if (!RegExUtil.isNumber(policeImport.getMobileNumber())){
+        if (!RegExUtil.isNumber(policeImport.getMobileNumber())) {
             return APIResponse.error("Police number must be a valid mobile number of police" + policeImport.getMobileNumber());
         }
-        if (isUniqueBuckleNumberInEvent(policeImport.getBuckleNo(), event.getId())){
+        if (isUniqueBuckleNumberInEvent(policeImport.getBuckleNo(), event.getId())) {
             Police police = new Police();
             Designation designation = designationService.getDesignationByNameOrNameInGujarati(policeImport.getDesignation());
             PoliceStation policeStation = policeStationService.readSpecificByNameOrDemo(policeImport.getPoliceStationName());
@@ -206,7 +220,7 @@ public class PoliceService {
             return APIResponse.ok();
         } else {
             APIResponse.error("Police already exists with buckle number " + policeImport.getBuckleNo() + " with name " + policeImport.getOfficerName() + " in event : " + event.getEventName());
-        };
+        }
         return APIResponse.error("something went Wrong or all police in excel already exists");
     }
 
@@ -219,20 +233,20 @@ public class PoliceService {
     }
 
     public List<PoliceDto> getAllPoliceInEvent(Long eventId) {
-         List<Police> policeListInEvent = policeRepository.getByEventId(eventId);
-         return policeListInEvent.stream().map(p->{
-             PoliceDto dto = new PoliceDto();
-             dto.setId(p.getId());
-             dto.setFullName(p.getFullName());
-             dto.setBuckleNumber(p.getBuckleNumber());
-             dto.setNumber(p.getNumber());
-             dto.setAge(p.getAge());
-             dto.setDistrict(p.getDistrict());
-             dto.setGender(p.getGender());
-             dto.setPoliceStationName(p.getPoliceStation().getPoliceStationName());
-             dto.setDesignationName(p.getDesignation().getName());
-             dto.setAssigned(p.isAssigned());
-             return dto;
-         }).collect(Collectors.toList());
+        List<Police> policeListInEvent = policeRepository.getByEventId(eventId);
+        return policeListInEvent.stream().map(p -> {
+            PoliceDto dto = new PoliceDto();
+            dto.setId(p.getId());
+            dto.setFullName(p.getFullName());
+            dto.setBuckleNumber(p.getBuckleNumber());
+            dto.setNumber(p.getNumber());
+            dto.setAge(p.getAge());
+            dto.setDistrict(p.getDistrict());
+            dto.setGender(p.getGender());
+            dto.setPoliceStationName(p.getPoliceStation().getPoliceStationName());
+            dto.setDesignationName(p.getDesignation().getName());
+            dto.setAssigned(p.isAssigned());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

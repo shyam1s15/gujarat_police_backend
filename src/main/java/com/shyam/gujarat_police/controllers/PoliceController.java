@@ -59,7 +59,7 @@ public class PoliceController {
     }
 
     @PutMapping("/{policeId}")
-    public APIResponse updatePolice(@RequestBody @Valid @NotNull @NotBlank PoliceDto police,
+    public APIResponse updatePolice(@RequestBody PoliceDto police,
                                @PathVariable("policeId") Long policeId){
 
         Police updatedPolice = policeService.updatePolice(police, policeId);

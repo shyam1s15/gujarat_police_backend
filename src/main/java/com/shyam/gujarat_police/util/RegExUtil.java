@@ -9,6 +9,9 @@ public class RegExUtil {
 	public static boolean isNumber(String value) {
 		return value != null ? value.matches("^-?[0-9]\\d*(\\.\\d+)?$") : false;
 	}
+	public static boolean isNumber(Integer value) {
+		return value != null ? String.valueOf(value).matches("^-?[0-9]\\d*(\\.\\d+)?$") : false;
+	}
 
 	public static boolean isBoolean(String value) {
 		return value != null ? value.matches("^(?i)(true|false)$") : false;
