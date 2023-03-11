@@ -10,12 +10,14 @@ import com.shyam.gujarat_police.entities.Police;
 import com.shyam.gujarat_police.entities.PoliceStation;
 import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
+import com.shyam.gujarat_police.exceptions.ExcelException;
 import com.shyam.gujarat_police.io.ExcelDataObject;
 import com.shyam.gujarat_police.io.XlsReader;
 import com.shyam.gujarat_police.io.dto.PoliceImportExcelDto;
 import com.shyam.gujarat_police.io.read.ExcelReadProcessor;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.response.APIResponse;
+import com.shyam.gujarat_police.util.FileUtils;
 import com.shyam.gujarat_police.util.ImportUtil;
 import com.shyam.gujarat_police.util.ObjectUtil;
 import com.shyam.gujarat_police.util.RegExUtil;
@@ -26,8 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -248,5 +255,19 @@ public class PoliceService {
             dto.setAssigned(p.isAssigned());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    public String downloadSamplePoliceExcel() {
+        String filename = null;
+        File policeDemoFile = null;
+        File tmpFile = null;
+        try {
+            tmpFile = FileUtils.createAndGetTempFile("xlsx");
+            policeDemoFile = ResourceUtils.getFile("classpath:files/police_insert_demo.xlsx");
+            FileUtils.copyExcelFile(policeDemoFile.getAbsolutePath(), tmpFile.getAbsolutePath());
+        } catch (IOException e) {
+            throw new ExcelException("Excel could not be downloaded");
+        }
+        return tmpFile.getAbsolutePath();
     }
 }

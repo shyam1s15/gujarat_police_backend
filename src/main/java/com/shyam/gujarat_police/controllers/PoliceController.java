@@ -103,4 +103,10 @@ public class PoliceController {
     public APIResponse countPoliceByEvent(@NotNull @PathVariable("event-id") Long eventId) {
         return policeService.countPoliceByEvent(eventId);
     }
+
+    @GetMapping("/download-sample-police-excel")
+    public APIResponse downloadSamplePoliceExcel() {
+        LOGGER.info("downloadSamplePoliceExcel");
+        return APIResponse.ok(policeService.downloadSamplePoliceExcel());
+    }
 }
