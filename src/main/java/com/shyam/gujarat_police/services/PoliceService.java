@@ -35,6 +35,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -241,7 +244,7 @@ public class PoliceService {
 
     public List<PoliceDto> getAllPoliceInEvent(Long eventId) {
         List<Police> policeListInEvent = policeRepository.getByEventId(eventId);
-        return policeListInEvent.stream().map(p -> {
+        return policeListInEvent.stream().sorted(Comparator.comparing(Police::getId)).map(p -> {
             PoliceDto dto = new PoliceDto();
             dto.setId(p.getId());
             dto.setFullName(p.getFullName());
