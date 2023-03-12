@@ -244,7 +244,7 @@ public class PoliceService {
 
     public List<PoliceDto> getAllPoliceInEvent(Long eventId) {
         List<Police> policeListInEvent = policeRepository.getByEventId(eventId);
-        return policeListInEvent.stream().sorted(Comparator.comparing(Police::getId)).map(p -> {
+        return policeListInEvent.stream().map(p -> {
             PoliceDto dto = new PoliceDto();
             dto.setId(p.getId());
             dto.setFullName(p.getFullName());
@@ -257,7 +257,7 @@ public class PoliceService {
             dto.setDesignationName(p.getDesignation().getName());
             dto.setAssigned(p.isAssigned());
             return dto;
-        }).collect(Collectors.toList());
+        }).toList().stream().sorted(Comparator.comparing(PoliceDto::getId)).toList();
     }
 
     public String downloadSamplePoliceExcel() {
