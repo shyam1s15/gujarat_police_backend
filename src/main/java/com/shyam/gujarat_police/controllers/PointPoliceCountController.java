@@ -36,6 +36,9 @@ public class PointPoliceCountController {
         return APIResponse.ok(resp);
     }
 
+    /**
+     * Merging save & update code
+     * */
     public APIResponse saveEventPoliceCountIndividual(@RequestBody PointPoliceCountDto dto){
         PointPoliceCount resp = pointPoliceCountService.savePointPoliceCountIndividual(dto, Boolean.TRUE);
         return APIResponse.ok(resp);

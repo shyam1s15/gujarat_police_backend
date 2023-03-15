@@ -23,6 +23,9 @@ public class EventPointPoliceCountAssignmentRespDto {
     @JsonProperty("event-name")
     private String eventName="";
 
+    @JsonProperty("point-name")
+    private String pointName = "";
+
     @JsonProperty("assignments")
     private List<DesignationCountRespDto> assignments;
 }

@@ -1,5 +1,6 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.dto.request.DesignationDto;
 import com.shyam.gujarat_police.dto.request.PointPoliceCountDto;
 import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceCountAssignmentRespDto;
@@ -15,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class PointPoliceCountService {
@@ -76,7 +79,7 @@ public class PointPoliceCountService {
             throw new DataSavingException("Data already exists for event " + event.getEventName() + " try updating the event's point allocation of point name " + point.getPointName());
         }
 
-        for (Map.Entry<String, String> designationCount : designationCounts.entrySet()){
+        for (Map.Entry<String, String> designationCount : designationCounts.entrySet()) {
             Long designationId = Long.parseLong(designationCount.getKey());
             Integer count = Integer.parseInt(designationCount.getValue());
             PointPoliceCountDto dto = new PointPoliceCountDto();
@@ -137,22 +140,38 @@ public class PointPoliceCountService {
         Event event = eventService.readSpecific(eventId);
         Point point = pointService.readSpecific(pointId);
         List<PointPoliceCount> data = pointPoliceCountRepository.getAllByEventAndPointId(eventId, pointId);
-        if (data.size() == 0) {
-            throw new DataNotFoundException("No data found for event " + event.getEventName() + " with point " + point.getPointName());
-        }
+        List<DesignationDto> allDesignations = designationService.getAllDesignations();
+//        if (data.size() == 0) {
+//            throw new DataNotFoundException("No data found for event " + event.getEventName() + " with point " + point.getPointName());
+//        }
         EventPointPoliceCountAssignmentRespDto resp = new EventPointPoliceCountAssignmentRespDto();
         resp.setEventId(eventId);
         resp.setPointId(pointId);
         List<DesignationCountRespDto> designationCountRespDtos = new ArrayList<>();
-        data.forEach( pointPoliceCount -> {
+        allDesignations.stream().forEach(d -> {
             DesignationCountRespDto dto = new DesignationCountRespDto();
-            dto.setDesignationId(pointPoliceCount.getDesignationId());
-            dto.setDesignationName(designationService.getDesignationById(pointPoliceCount.getDesignationId()).getName());
-            dto.setDesignationCount(pointPoliceCount.getDesignationCount());
+
+            if (CollectionUtil.nonNullNonEmpty(data)){
+                PointPoliceCount ppc = data.stream().filter(p -> p.getDesignationId().equals(d.getId())).findAny().orElse(null);
+                dto.setDesignationCount(ppc != null ? ppc.getDesignationCount() : 0);
+            } else {
+                // make designation count 0
+                dto.setDesignationCount(0);
+            }
+            dto.setDesignationId(d.getId());
+            dto.setDesignationName(d.getName());
             designationCountRespDtos.add(dto);
         });
-        resp.setAssignments(designationCountRespDtos);
+//        data.forEach( pointPoliceCount -> {
+//            DesignationCountRespDto dto = new DesignationCountRespDto();
+//            dto.setDesignationId(pointPoliceCount.getDesignationId());
+//            dto.setDesignationName(designationService.getDesignationById(pointPoliceCount.getDesignationId()).getName());
+//            dto.setDesignationCount(pointPoliceCount.getDesignationCount());
+//            designationCountRespDtos.add(dto);
+//        });
+        resp.setAssignments(designationCountRespDtos.stream().sorted(Comparator.comparing(DesignationCountRespDto::getDesignationId)).collect(Collectors.toList()));
         resp.setEventName(event.getEventName());
+        resp.setPointName(point.getPointName());
         return resp;
 //        return null;
     }
