@@ -80,13 +80,19 @@ public class PointPoliceCountController {
     }
 
     @PostMapping("/designation-counts")
-    public APIResponse readAllByEventDesignationCountsAndEventName(@RequestBody EventAndPointIdDto dto){
+    public APIResponse readAllByEventPointDesignationCountsAndEventName(@RequestBody EventAndPointIdDto dto){
         Long eventId = dto.getEventId();
         Long pointId = dto.getPointId();
         EventPointPoliceCountAssignmentRespDto resp = pointPoliceCountService.readAllByPointDesignationCountsAndEventName(eventId, pointId);
         return APIResponse.ok(resp);
     }
 
+    @PostMapping("all-point-designation-counts-in-event")
+    public APIResponse readAllByEventDesignationCountsAndEventName(@RequestBody EventAndPointIdDto dto) {
+        Long evenId = dto.getEventId();
+        List<EventPointPoliceCountAssignmentRespDto> resp = pointPoliceCountService.readAllPointAssignmentsInEvent(evenId);
+        return APIResponse.ok(resp);
+    }
 //    @GetMapping("/assignments")
 //    public APIResponse readAllInAssignmentFormat(){
 //        List<EventPoliceCountAssignmentRowDto> resp = pointPoliceCountService.readAllInAssignmentFormat();

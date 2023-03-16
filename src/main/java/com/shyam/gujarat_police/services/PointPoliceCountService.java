@@ -189,4 +189,9 @@ public class PointPoliceCountService {
         });
         return eventAssignmentList;
     }
+
+    public List<EventPointPoliceCountAssignmentRespDto> readAllPointAssignmentsInEvent(Long evenId) {
+        List<Long> pointsInEvent = pointPoliceCountRepository.getAllPointIdsForEvent(evenId);
+        return pointsInEvent.stream().map(pointId->readAllByPointDesignationCountsAndEventName(evenId, pointId)).collect(Collectors.toList());
+    }
 }
