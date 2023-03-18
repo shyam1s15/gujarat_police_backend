@@ -1,7 +1,5 @@
 package com.shyam.gujarat_police;
 
-import com.shyam.gujarat_police.util.DateUtil;
-import com.shyam.gujarat_police.util.RegExUtil;
 import de.taimos.totp.TOTP;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
@@ -11,9 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @SpringBootApplication
 public class GujaratPoliceApplication {
@@ -45,17 +40,5 @@ public class GujaratPoliceApplication {
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-}
-
-interface abc {
-	default void bakri(){
-		System.out.println("bakri");
-	}
-}
-
-class cbd implements abc {
-	public void bakri(){
-		System.out.println("bakri chor");
 	}
 }
