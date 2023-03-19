@@ -113,8 +113,10 @@ public class PointPoliceCountService {
             dto.setDesignationId(designationId);
             dto.setDesignationCount(count);
             dto.setPointId(point.getId());
-            PointPoliceCount pointPoliceCount = savePointPoliceCountIndividual(dto, Boolean.FALSE);
-            resp.add(pointPoliceCount);
+            if (dto.getDesignationCount() > 0) {
+                PointPoliceCount pointPoliceCount = savePointPoliceCountIndividual(dto, Boolean.FALSE);
+                resp.add(pointPoliceCount);
+            }
         }
         return (List<PointPoliceCount>) CollectionUtil.makeCollection(pointPoliceCountRepository.saveAll(resp));
     }
@@ -289,7 +291,7 @@ public class PointPoliceCountService {
             }
             ppc.setDesignationCount(ppc.getDesignationCount() + d.getValue());
             return ppc;
-        }).collect(Collectors.toList());
+        }).filter(e -> e.getDesignationCount() > 0).collect(Collectors.toList());
         System.out.println(existingCounts);
         pointPoliceCountRepository.saveAll(existingCounts);
     }
