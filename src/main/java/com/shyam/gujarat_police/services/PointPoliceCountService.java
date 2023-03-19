@@ -1,13 +1,11 @@
 package com.shyam.gujarat_police.services;
 
-import com.shyam.gujarat_police.controllers.AssignPoliceController;
 import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
 import com.shyam.gujarat_police.dto.request.DesignationDto;
 import com.shyam.gujarat_police.dto.request.PointPoliceCountDto;
 import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceCountAssignmentRespDto;
 import com.shyam.gujarat_police.dto.response.EventPoliceCountAssignmentRowDto;
-import com.shyam.gujarat_police.entities.AssignPolice;
 import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Point;
 import com.shyam.gujarat_police.entities.PointPoliceCount;
@@ -19,7 +17,6 @@ import com.shyam.gujarat_police.repositories.PointPoliceCountRepository;
 import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.util.CollectionUtil;
 import com.shyam.gujarat_police.util.DateUtil;
-import org.hibernate.id.Assigned;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -231,6 +229,15 @@ public class PointPoliceCountService {
         if (dto.getEventId() == null || dto.getPointId() == null) {
             throw new DataNotFoundException("Event id or point id not provided");
         }
+//        /** validating edge case: only zeros provided? */
+//        AtomicBoolean invalidInput = new AtomicBoolean(true);
+//        dto.getAssignments().stream().forEach(assignment -> {
+//            if (assignment.getDesignationCount() > 0) {
+//                invalidInput.set(false);
+//            }
+//        });
+//        if (invalidInput.get()) throw new InsufficientDataException("Data missing in assignment, please provided valid assignment");
+
         /** validating event and point exists */
         Point point = pointService.readSpecific(dto.getPointId());
         Event event = eventService.readSpecific(dto.getEventId());
