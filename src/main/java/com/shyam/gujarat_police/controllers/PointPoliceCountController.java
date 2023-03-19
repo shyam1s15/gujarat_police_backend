@@ -3,6 +3,7 @@ package com.shyam.gujarat_police.controllers;
 
 import com.shyam.gujarat_police.dto.request.EventAndPointIdDto;
 import com.shyam.gujarat_police.dto.request.PointPoliceCountDto;
+import com.shyam.gujarat_police.dto.response.EventPointPoliceAssignmentRespDto;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceCountAssignmentRespDto;
 import com.shyam.gujarat_police.entities.PointPoliceCount;
 import com.shyam.gujarat_police.response.APIResponse;
@@ -87,11 +88,17 @@ public class PointPoliceCountController {
         return APIResponse.ok(resp);
     }
 
-    @PostMapping("all-point-designation-counts-in-event")
+    @PostMapping("/all-point-designation-counts-in-event")
     public APIResponse readAllByEventDesignationCountsAndEventName(@RequestBody EventAndPointIdDto dto) {
         Long evenId = dto.getEventId();
         List<EventPointPoliceCountAssignmentRespDto> resp = pointPoliceCountService.readAllPointAssignmentsInEvent(evenId);
         return APIResponse.ok(resp);
+    }
+
+    @PostMapping("/save-update")
+    public APIResponse reAssignPolice(@RequestBody EventPointPoliceCountAssignmentRespDto dto) {
+        pointPoliceCountService.reAssignInPointOfEvent(dto);
+        return APIResponse.ok();
     }
 //    @GetMapping("/assignments")
 //    public APIResponse readAllInAssignmentFormat(){

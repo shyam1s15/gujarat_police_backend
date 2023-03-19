@@ -444,6 +444,7 @@ public class AssignPoliceService {
         }
         Point point = pointService.readSpecific(dto.getPointId());
         Event event = eventService.readSpecific(dto.getEventId());
+        Map<Long, Integer> designationCountToBeIncremented = new HashMap<>();
         if (!policeList.isEmpty() && Objects.nonNull(point)
                 && Objects.nonNull(event)){
             List<AssignPolice> assignPoliceList = new ArrayList<>();
@@ -464,10 +465,14 @@ public class AssignPoliceService {
                 assignPolice.setPolice(police);
                 assignPolice.setPoint(point);
                 assignPolice.setEvent(event);
+                designationCountToBeIncremented.put(police.getDesignation().getId(),
+                        designationCountToBeIncremented.get(police.getDesignation().getId()) == null ? 1
+                                : designationCountToBeIncremented.get(police.getDesignation().getId())+1);
                 assignPoliceList.add(assignPolice);
             });
             assignPoliceRepository.saveAll(assignPoliceList);
             policeRepository.updatePoliceAssignStatusAssigned(policeList.stream().map(Police::getId).collect(Collectors.toList()));
+            pointPoliceCountService.incrementDesignationCountByAssignedPolice(event.getId(), point.getId(), designationCountToBeIncremented);
             return APIResponse.ok("Total of " + assignPoliceList.size() + " police were assigned in event " + event.getEventName());
         } else {
             throw new DataSavingException("Could not save assigned police information");

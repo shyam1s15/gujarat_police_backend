@@ -1,22 +1,35 @@
 package com.shyam.gujarat_police.services;
 
+import com.shyam.gujarat_police.controllers.AssignPoliceController;
+import com.shyam.gujarat_police.dto.request.AssignPoliceDto;
 import com.shyam.gujarat_police.dto.request.DesignationDto;
 import com.shyam.gujarat_police.dto.request.PointPoliceCountDto;
 import com.shyam.gujarat_police.dto.response.DesignationCountRespDto;
 import com.shyam.gujarat_police.dto.response.EventPointPoliceCountAssignmentRespDto;
 import com.shyam.gujarat_police.dto.response.EventPoliceCountAssignmentRowDto;
+import com.shyam.gujarat_police.entities.AssignPolice;
 import com.shyam.gujarat_police.entities.Event;
 import com.shyam.gujarat_police.entities.Point;
 import com.shyam.gujarat_police.entities.PointPoliceCount;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.exceptions.DataSavingException;
+import com.shyam.gujarat_police.exceptions.InsufficientDataException;
+import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.repositories.PointPoliceCountRepository;
+import com.shyam.gujarat_police.repositories.PoliceRepository;
 import com.shyam.gujarat_police.util.CollectionUtil;
+import com.shyam.gujarat_police.util.DateUtil;
+import org.hibernate.id.Assigned;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +49,20 @@ public class PointPoliceCountService {
     
     @Autowired
     private PointPoliceCountRepository pointPoliceCountRepository;
-    
+
+    @Autowired
+    private AssignPoliceRepository assignPoliceRepository;
+
+    @Lazy
+    @Autowired
+    private AssignPoliceService assignPoliceService;
+
+    @Autowired
+    private PoliceRepository policeRepository;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PointPoliceCountService.class);
+
+
     public List<PointPoliceCount> getAllPointPoliceCount() {
         return (List<PointPoliceCount>) pointPoliceCountRepository.findAll();
     }
@@ -193,5 +219,78 @@ public class PointPoliceCountService {
     public List<EventPointPoliceCountAssignmentRespDto> readAllPointAssignmentsInEvent(Long evenId) {
         List<Long> pointsInEvent = pointPoliceCountRepository.getAllPointIdsForEvent(evenId);
         return pointsInEvent.stream().map(pointId->readAllByPointDesignationCountsAndEventName(evenId, pointId)).collect(Collectors.toList());
+    }
+
+    /**
+     * @Description deletes existing assigned police and reassign new police
+     * if requested police <= existing free(police) + assigned(assigned_police)
+     * */
+    public void reAssignInPointOfEvent(EventPointPoliceCountAssignmentRespDto dto) {
+        if (dto.getEventId() == null || dto.getPointId() == null) {
+            throw new DataNotFoundException("Event id or point id not provided");
+        }
+        /** validating event and point exists */
+        Point point = pointService.readSpecific(dto.getPointId());
+        Event event = eventService.readSpecific(dto.getEventId());
+
+        List<DesignationCountRespDto> totalFreePolice = policeRepository.getFreePoliceMappingByDesignation(dto.getEventId());
+        List<PointPoliceCount> totalRequestedPolice = pointPoliceCountRepository.getAllByEventAndPointId(dto.getEventId(), dto.getPointId());
+        Map<String, String> designationCounts = new HashMap();
+
+        /** Validating sufficient police */
+        dto.getAssignments().stream().forEach(requested -> {
+            int freePoliceOfDesignation = totalFreePolice.stream().filter(t->t.getDesignationId().equals(requested.getDesignationId())).map(DesignationCountRespDto::getDesignationCount).findAny().orElse(0);
+            int assignedPoliceOfDesignation = totalRequestedPolice.stream().filter(t->t.getDesignationId().equals(requested.getDesignationId())).map(t->t.getDesignationCount()).findAny().orElse(0);
+
+            if ( requested.getDesignationCount() > (assignedPoliceOfDesignation + freePoliceOfDesignation)) {
+                System.out.println(freePoliceOfDesignation + " " + assignedPoliceOfDesignation + " " + requested.getDesignationCount());
+                throw new InsufficientDataException("Insufficient Police with designation : " + requested.getDesignationName());
+            }
+            designationCounts.put(requested.getDesignationId().toString(), requested.getDesignationCount().toString());
+        });
+
+        assignPoliceRepository.removeAssignedPoliceFromPointInEvent(dto.getEventId(), dto.getPointId());
+        Map<String, Object> param = new HashMap<>();
+        param.put("designations", designationCounts);
+        param.put("event-id", dto.getEventId());
+        param.put("point-id", dto.getPointId());
+        /** saving in records table */
+        saveMultiplePointPoliceCount(param);
+
+        AssignPoliceDto param2 = new AssignPoliceDto();
+        param2.setDutyStartDate(DateUtil.dateToISTString(event.getEventStartDate(), "dd/MM/yyyy"));
+        param2.setDutyEndDate(DateUtil.dateToISTString(event.getEventEndDate(), "dd/MM/yyyy"));
+        param2.setAssignedDate(DateUtil.dateToISTString(new Date(), "dd/MM/yyyy"));
+        param2.setEventId(event.getId());
+        param2.setPointId(point.getId());
+
+        /** assiging in the point as per updated record*/
+        assignPoliceService.pointEventLevelAssignment(param2);
+    }
+
+    public void incrementDesignationCountByAssignedPolice(Long eventId, Long pointId, Map<Long, Integer> designationCount) {
+        LOGGER.info("incrementDesignationCountByAssignedPolice");
+        System.out.println(designationCount);
+        List<PointPoliceCount> existingCounts = pointPoliceCountRepository.getAllByEventAndPointId(eventId, pointId);
+//        existingCounts.forEach(e -> {
+//            Integer count = designationCount.get(e.getDesignationId());
+//            if (count != null) {
+//                e.setDesignationCount(e.getDesignationCount() + count);
+//            }
+//        });
+        List<PointPoliceCount> finalExistingCounts = existingCounts;
+        existingCounts = designationCount.entrySet().stream().map(d -> {
+            PointPoliceCount ppc = finalExistingCounts.stream().filter(e->e.getDesignationId() == d.getKey()).findAny().orElse(new PointPoliceCount());
+            ppc.setPointId(pointId);
+            ppc.setEventId(eventId);
+            if (ppc.getDesignationCount() == null) {
+                ppc.setDesignationId(d.getKey());
+                ppc.setDesignationCount(0);
+            }
+            ppc.setDesignationCount(ppc.getDesignationCount() + d.getValue());
+            return ppc;
+        }).collect(Collectors.toList());
+        System.out.println(existingCounts);
+        pointPoliceCountRepository.saveAll(existingCounts);
     }
 }
