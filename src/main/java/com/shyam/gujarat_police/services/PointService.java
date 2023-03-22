@@ -3,10 +3,12 @@ package com.shyam.gujarat_police.services;
 import com.shyam.gujarat_police.dto.request.PointDto;
 import com.shyam.gujarat_police.entities.Point;
 import com.shyam.gujarat_police.entities.Zone;
+import com.shyam.gujarat_police.exceptions.DataAlreadyExistException;
 import com.shyam.gujarat_police.exceptions.DataNotFoundException;
 import com.shyam.gujarat_police.repositories.AssignPoliceRepository;
 import com.shyam.gujarat_police.repositories.PointRepository;
 import com.shyam.gujarat_police.response.APIResponse;
+import com.shyam.gujarat_police.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +51,17 @@ public class PointService {
         point.setRemarks(dto.getRemarks());
         Zone zone = zoneService.readSpecifiZone(dto.getZone());
         point.setZone(zone);
+        /** Check if same point exists in same zone */
+        List<Point> pointsInZone = zone.getPoints();
+        boolean isExists = false;
+        if (CollectionUtil.nonNullNonEmpty(pointsInZone)) {
+            isExists = pointsInZone.stream().anyMatch(p -> p.getPointName().equalsIgnoreCase(point.getPointName()));
+        }
+        if (isExists) {
+            throw new DataAlreadyExistException("Point already exists with point name " + point.getPointName());
+        }
         return pointRepository.save(point);
+
     }
 
     public Point updatePoint(PointDto point, Long pointId) {
