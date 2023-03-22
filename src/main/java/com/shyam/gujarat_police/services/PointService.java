@@ -12,6 +12,7 @@ import com.shyam.gujarat_police.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class PointService {
             dto.setAccessories(point.getAccessories());
             dto.setRemarks(point.getRemarks());
             return dto;
-        }).collect(Collectors.toList());
+        }).sorted(Comparator.comparing(PointDto::getId, Comparator.reverseOrder())).collect(Collectors.toList());
     }
 
     public Point savePoint(PointDto dto) {
