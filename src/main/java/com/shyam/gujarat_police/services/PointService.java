@@ -28,6 +28,7 @@ public class PointService {
     private AssignPoliceRepository assignPoliceRepository;
 
     public List<PointDto> getPoints() {
+        System.out.println("Hii");
         List<Point> points = (List<Point>) pointRepository.findAll();
         return points.stream().map(point-> {
             PointDto dto = new PointDto();
